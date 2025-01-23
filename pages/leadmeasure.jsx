@@ -9,7 +9,7 @@ const Leadmeasure = () => {
   const [divisi, setDivisi] = useState(null);
   const [id_devisi, setid_devisi] = useState(null);
   const [leadmeasure, setLeadMeasure] = useState([]);
-  const [inputan, setInputan] = useState(null);
+  const [inputValues, setInputValues] = useState({});
 
   // Fetch data from API
   useEffect(() => {
@@ -29,8 +29,6 @@ const Leadmeasure = () => {
       }
     }
 
-    console.log(id_devisi);
-
     const fetchWigOptions = async () => {
       try {
         const response = await fetch(
@@ -38,11 +36,10 @@ const Leadmeasure = () => {
         );
         const data = await response.json();
 
-        // Map data to options for React Select
         const options = Array.isArray(data.data)
           ? data.data.map((item) => ({
-              value: item.id_wig, // Adjust based on API response field
-              label: item.wig, // Adjust based on API response field
+              value: item.id_wig,
+              label: item.wig,
             }))
           : [];
 
@@ -52,7 +49,9 @@ const Leadmeasure = () => {
       }
     };
 
-    fetchWigOptions();
+    if (id_devisi) {
+      fetchWigOptions();
+    }
   }, [id_devisi]);
 
   useEffect(() => {
@@ -81,13 +80,20 @@ const Leadmeasure = () => {
         }
       );
       const data = await response.json();
+
+      const initialInputValues = {};
+      data.data.forEach((item) => {
+        initialInputValues[item.id_leadmeasure] = item.actual_input || "";
+      });
+
       setLeadMeasure(data.data || []);
+      setInputValues(initialInputValues);
     } catch (error) {
       console.error("Error fetching lead measure:", error);
     }
   };
 
-  const updateLeadmeasure = async () => {
+  const updateLeadmeasure = async (id_leadmeasure) => {
     if (!selectedWig) {
       console.error("Selected WIG is not set.");
       return;
@@ -103,7 +109,8 @@ const Leadmeasure = () => {
           },
           body: JSON.stringify({
             id_wig: selectedWig.value,
-            actual_input: inputan,
+            id_leadmeasure: id_leadmeasure,
+            actual_input: inputValues[id_leadmeasure],
           }),
         }
       );
@@ -111,8 +118,112 @@ const Leadmeasure = () => {
       alert(data.message);
       getLeadMeasure();
     } catch (error) {
-      console.error("Error fetching lead measure:", error);
+      console.error("Error updating lead measure:", error);
     }
+  };
+
+  const hapusLeadmeasure = async (id_leadmeasure) => {
+    if (!selectedWig) {
+      console.error("Selected WIG is not set.");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Apakah Anda yakin ingin menghapus leadmeasure ini?"
+    );
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://202.58.199.194:8080/api-appit/public/wig/hapusLeadMeasure`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_leadmeasure: id_leadmeasure,
+          }),
+        }
+      );
+      const data = await response.json();
+      alert(data.message);
+      getLeadMeasure();
+    } catch (error) {
+      console.error("Error deleting lead measure:", error);
+    }
+  };
+
+  const tambahBaris = () => {
+    const newRowData = {
+      id_leadmeasure: `new-${Date.now()}`,
+      leadmeasure: "",
+      sisa_target: 0,
+      rill_target: 0,
+      actual_input: 0,
+      isNew: true,
+    };
+
+    setLeadMeasure((prev) => [...prev, newRowData]);
+    setInputValues((prev) => ({
+      ...prev,
+      [newRowData.id_leadmeasure]: "",
+    }));
+  };
+
+  const saveBarisBaru = async () => {
+    if (!selectedWig) {
+      console.error("Selected WIG is not set.");
+      return;
+    }
+
+    try {
+      const newRows = leadmeasure.filter((item) => item.isNew);
+      for (const row of newRows) {
+        if (!row.leadmeasure || !row.rill_target) {
+          alert("Lead Measure dan Rill Target tidak boleh kosong.");
+          return;
+        }
+
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/tambahLeadMeasure`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id_devisi: id_devisi,
+              id_wig: selectedWig.value,
+              leadmeasure: row.leadmeasure,
+              sisa_target: row.sisa_target,
+              rill_target: row.rill_target,
+            }),
+          }
+        );
+        const data = await response.json();
+        alert(data.message);
+      }
+      getLeadMeasure();
+    } catch (error) {
+      console.error("Error saving new lead measure:", error);
+    }
+  };
+
+  const handleInputChange = (id_leadmeasure, value) => {
+    setInputValues((prevValues) => ({
+      ...prevValues,
+      [id_leadmeasure]: value,
+    }));
+  };
+
+  const handleRillTargetChange = (index, value) => {
+    const updatedLeadmeasure = [...leadmeasure];
+    updatedLeadmeasure[index].rill_target = value;
+    updatedLeadmeasure[index].sisa_target = value;
+    setLeadMeasure(updatedLeadmeasure);
   };
 
   return (
@@ -125,7 +236,7 @@ const Leadmeasure = () => {
             </h2>
           </div>
           <div>
-            {divisi && ( // Render divisi if available
+            {divisi && (
               <p className="text-gray-700 mb-4 font-bold">Divisi: {divisi}</p>
             )}
           </div>
@@ -150,7 +261,7 @@ const Leadmeasure = () => {
 
         <div className="mt-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            List Lead Measure <br></br>
+            List Lead Measure <br />
             {selectedWig ? `(${selectedWig.label})` : ""}
           </label>
           <table className="table-auto w-full">
@@ -165,34 +276,108 @@ const Leadmeasure = () => {
               </tr>
             </thead>
             <tbody>
-              {leadmeasure &&
-                leadmeasure.map((item, index) => (
-                  <tr key={index}>
-                    <td className="border px-4 py-2">{index + 1}</td>
-                    <td className="border px-4 py-2">{item.leadmeasure}</td>
-                    <td className="border px-4 py-2">{item.sisa_target}</td>
-                    <td className="border px-4 py-2">{item.rill_target}</td>
-                    <td className="border px-4 py-2">
+              {leadmeasure.map((item, index) => (
+                <tr key={index}>
+                  <td className="border px-4 py-2">{index + 1}</td>
+                  <td className="border px-4 py-2">
+                    {item.isNew ? (
+                      <input
+                        type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        value={item.leadmeasure}
+                        onChange={(e) => {
+                          const updatedLeadmeasure = [...leadmeasure];
+                          updatedLeadmeasure[index].leadmeasure =
+                            e.target.value;
+                          setLeadMeasure(updatedLeadmeasure);
+                        }}
+                      />
+                    ) : (
+                      item.leadmeasure
+                    )}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {item.isNew ? (
                       <input
                         type="number"
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={inputan}
-                        onChange={(e) => setInputan(e.target.value)}
+                        value={item.sisa_target}
+                        readOnly
                       />
-                    </td>
-                    <td className="border px-4 py-2">
-                      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mr-2">
-                        Hapus
-                      </button>
-                      <button
-                        onClick={updateLeadmeasure}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
-                      >
-                        Kirim
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                    ) : (
+                      item.sisa_target
+                    )}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {item.isNew ? (
+                      <input
+                        type="number"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        value={item.rill_target}
+                        onChange={(e) =>
+                          handleRillTargetChange(index, e.target.value)
+                        }
+                      />
+                    ) : (
+                      item.rill_target
+                    )}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {!item.isNew && (
+                      <input
+                        type="number"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        value={inputValues[item.id_leadmeasure] || ""}
+                        onChange={(e) =>
+                          handleInputChange(item.id_leadmeasure, e.target.value)
+                        }
+                      />
+                    )}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {item.isNew ? (
+                      <>
+                        <button
+                          onClick={saveBarisBaru}
+                          className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            const updatedLeadmeasure = leadmeasure.filter(
+                              (row) =>
+                                row.id_leadmeasure !== item.id_leadmeasure
+                            );
+                            setLeadMeasure(updatedLeadmeasure);
+                            const updatedInputValues = { ...inputValues };
+                            delete updatedInputValues[item.id_leadmeasure];
+                            setInputValues(updatedInputValues);
+                          }}
+                          className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                        >
+                          Hapus
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => updateLeadmeasure(item.id_leadmeasure)}
+                          className="bg-green-500 text-xs hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
+                        >
+                          Update
+                        </button>
+                        <button
+                          onClick={() => hapusLeadmeasure(item.id_leadmeasure)}
+                          className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                        >
+                          Hapus
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -204,6 +389,13 @@ const Leadmeasure = () => {
             onClick={() => router.back()}
           >
             Back
+          </button>
+          <button
+            className="font-xs mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button"
+            onClick={tambahBaris}
+          >
+            Tambah Baris
           </button>
         </div>
       </div>
