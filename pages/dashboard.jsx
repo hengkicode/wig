@@ -10,13 +10,20 @@ import {
   Legend,
 } from 'chart.js';
 import { motion, AnimatePresence } from 'framer-motion';
+// 1) Import ikon lucide sesuai request
+import { ChartNoAxesCombined, TrendingUp, ChartLine, TrendingDown } from 'lucide-react';
 
-// Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedDivision, setSelectedDivision] = useState(null);
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  // Data dummy
   const data = {
     globalGrowth: 3.7,
     revenueMetrics: {
@@ -132,40 +139,36 @@ const Dashboard = () => {
     ],
   };
 
-  // Contoh data chart untuk Revenue Growth
+  // Chart data & options (Revenue Growth)
   const revenueGrowthChartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
     datasets: [
       {
         label: 'Revenue Growth (%)',
         data: data.revenueGrowth,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: data.revenueGrowth.map((value) =>
+          value < 0 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'
+        ),
+        borderColor: data.revenueGrowth.map((value) =>
+          value < 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+        ),
         borderWidth: 1,
       },
     ],
   };
-
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Revenue Growth (%)',
-      },
+      legend: { position: 'top' },
+      title: { display: true, text: 'Revenue Growth (%)' },
     },
     scales: {
-      y: {
-        beginAtZero: true,
-      },
+      y: { beginAtZero: true },
     },
   };
 
-  // Lead Measure Chart
+  // Lead Measure chart
   const leadMeasureChartData = {
     labels: ['Lead Measure'],
     datasets: [
@@ -192,31 +195,21 @@ const Dashboard = () => {
       },
     ],
   };
-
   const leadMeasureChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Lead Measure Progress',
-      },
+      legend: { position: 'top' },
+      title: { display: true, text: 'Lead Measure Progress' },
     },
     indexAxis: 'y',
     scales: {
-      x: {
-        stacked: true,
-        beginAtZero: true,
-      },
-      y: {
-        stacked: true,
-      },
+      x: { stacked: true, beginAtZero: true },
+      y: { stacked: true },
     },
   };
 
-  // WIG Status Chart
+  // WIG Status chart
   const wigStatusChartData = {
     labels: ['WIG Status'],
     datasets: [
@@ -243,78 +236,107 @@ const Dashboard = () => {
       },
     ],
   };
-
   const wigStatusChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'WIG Status Progress',
-      },
+      legend: { position: 'top' },
+      title: { display: true, text: 'WIG Status Progress' },
     },
     indexAxis: 'y',
     scales: {
-      x: {
-        stacked: true,
-        beginAtZero: true,
-      },
-      y: {
-        stacked: true,
-      },
+      x: { stacked: true, beginAtZero: true },
+      y: { stacked: true },
     },
   };
 
-  // Event saat klik divisi
+  // Handlers
   const handleDivisionClick = (division) => {
     setSelectedDivision(division);
   };
-
   const closePopup = () => {
     setSelectedDivision(null);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div
+      className={`${isDarkMode ? 'dark' : ''} min-h-screen bg-gray-50 dark:bg-slate-800 p-4 sm:p-6 transition-colors duration-300`}
+    >
       {/* Header */}
-      <header className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <div className="flex justify-between items-center">
+      <header className="bg-white dark:bg-slate-700 shadow-md rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="h-12 w-12 rounded-full" />
-            <h1 className="text-3xl font-bold">Dashboard Workshop 2024</h1>
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="h-12 w-12 object-contain"
+            />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
+              Dashboard Workshop 2024
+            </h1>
           </div>
-          <p className="text-gray-500">26/01/2025</p>
+          <div className="flex items-center gap-3">
+            <p className="text-gray-500 dark:text-gray-200">26/01/2025</p>
+            <button
+              onClick={toggleDarkMode}
+              className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
+            >
+              {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Metrics */}
-      <div className="grid grid-cols-4 gap-6 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
+
+        {/* GLOBAL GROWTH */}
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold">Global Growth</h2>
-          <p className="text-2xl font-bold text-blue-600">{data.globalGrowth}%</p>
+          {/* Icon + Percentage in one line with gold color */}
+          <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-2">
+          <ChartNoAxesCombined />
+          <span>{data.globalGrowth}%</span>
+           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
+
+
+        {/* HIGHEST MONTHLY REVENUE */}
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold">Highest Monthly Revenue</h2>
-          <p className="text-2xl font-bold text-green-600">{data.revenueMetrics.highest}%</p>
+          <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
+            <TrendingUp />
+            <span>{data.revenueMetrics.highest}%</span>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
+
+        {/* AVERAGE MONTHLY REVENUE */}
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold">Average Monthly Revenue</h2>
-          <p className="text-2xl font-bold text-blue-600">{data.revenueMetrics.average}%</p>
+          <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
+            <ChartLine />
+            <span>{data.revenueMetrics.average}%</span>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
+
+        {/* LOWEST MONTHLY REVENUE */}
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold">Lowest Monthly Revenue</h2>
-          <p className="text-2xl font-bold text-red-600">{data.revenueMetrics.lowest}%</p>
+          <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400 mt-2">
+            <TrendingDown />
+            <span>{data.revenueMetrics.lowest}%</span>
+          </div>
         </div>
       </div>
 
-      {/* Lead Measure and WIG Status */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-md">
+      {/* Lead Measure & WIG Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">Leadmeasure Status</h2>
-          <p className="text-2xl font-bold mb-4">Progress: {data.leadMeasure.progress}%</p>
-          <div style={{ height: '300px' }}>
+          <p className="text-xl sm:text-2xl font-bold mb-4">
+            Progress: {data.leadMeasure.progress}%
+          </p>
+          <div className="flex-1" style={{ minHeight: '250px' }}>
             <Bar data={leadMeasureChartData} options={leadMeasureChartOptions} />
           </div>
           <div className="grid grid-cols-3 gap-2 mt-4">
@@ -332,10 +354,13 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
+
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">WIG Status</h2>
-          <p className="text-2xl font-bold mb-4">Progress: {data.wigStatus.progress}%</p>
-          <div style={{ height: '300px' }}>
+          <p className="text-xl sm:text-2xl font-bold mb-4">
+            Progress: {data.wigStatus.progress}%
+          </p>
+          <div className="flex-1" style={{ minHeight: '250px' }}>
             <Bar data={wigStatusChartData} options={wigStatusChartOptions} />
           </div>
           <div className="grid grid-cols-3 gap-2 mt-4">
@@ -355,15 +380,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Revenue Growth and Division Progress */}
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        <div className="col-span-2 bg-white p-4 rounded-lg shadow-md">
+      {/* Revenue Growth & Division Progress */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold mb-4">Revenue Growth 2024</h2>
-          <div style={{ height: '400px' }}>
+          <div className="flex-1" style={{ minHeight: '300px' }}>
             <Bar data={revenueGrowthChartData} options={chartOptions} />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold mb-4">Division Progress</h2>
           <div className="space-y-2">
             {data.divisionProgress.map((division, index) => (
@@ -374,11 +399,17 @@ const Dashboard = () => {
                 >
                   {division.name}
                 </p>
-                <div className="relative h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-green-500 rounded-full"
-                    style={{ width: `${division.progress}%` }}
-                  ></div>
+                <div className="flex items-center">
+                  <div className="relative flex-1 h-2 bg-gray-200 rounded-full mr-2">
+                    <div
+                      className="absolute top-0 left-0 h-full rounded-full"
+                      style={{
+                        width: `${division.progress}%`,
+                        backgroundColor: division.progress === 100 ? 'blue' : 'green',
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold">{division.progress}%</span>
                 </div>
               </div>
             ))}
@@ -386,19 +417,17 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Popup for Division Details */}
+      {/* Popup Division */}
       <AnimatePresence>
         {selectedDivision && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           >
-            <div className="bg-white rounded-lg p-6 shadow-lg w-96 max-h-[80vh] overflow-auto">
+            <div className="bg-white dark:bg-slate-700 dark:text-gray-200 rounded-lg p-4 sm:p-6 shadow-lg w-full max-w-md max-h-[80vh] overflow-auto transition-colors">
               <h2 className="text-lg font-bold mb-4">{selectedDivision.name} Details</h2>
-              
-              {/* Bisa juga tampilkan ringkasan progress di sini */}
               <p className="mb-2">
                 <strong>Lead Measure Progress:</strong> {selectedDivision.lmProgress}%
               </p>
@@ -406,10 +435,9 @@ const Dashboard = () => {
                 <strong>WIG Progress:</strong> {selectedDivision.wigProgress}%
               </p>
 
-              {/* Tabel detail */}
               <table className="min-w-full border text-sm mb-4">
                 <thead>
-                  <tr className="bg-gray-100">
+                  <tr className="bg-gray-100 dark:bg-slate-600">
                     <th className="border px-2 py-1 text-left">WIG</th>
                     <th className="border px-2 py-1 text-left">Lead Measure</th>
                     <th className="border px-2 py-1 text-center">Target</th>
@@ -419,20 +447,26 @@ const Dashboard = () => {
                 </thead>
                 <tbody>
                   {selectedDivision.details?.map((item, idx) => (
-                    <tr key={idx}>
-                      <td className="border px-2 py-1">{item.wigName}</td>
-                      <td className="border px-2 py-1">{item.leadMeasure}</td>
-                      <td className="border px-2 py-1 text-center">{item.totalTarget}</td>
-                      <td className="border px-2 py-1 text-center">{item.totalActual}</td>
-                      <td className="border px-2 py-1 text-center">{item.achievement}%</td>
+                    <tr key={idx} className="dark:border-slate-600">
+                      <td className="border px-2 py-1 dark:border-slate-600">{item.wigName}</td>
+                      <td className="border px-2 py-1 dark:border-slate-600">{item.leadMeasure}</td>
+                      <td className="border px-2 py-1 text-center dark:border-slate-600">
+                        {item.totalTarget}
+                      </td>
+                      <td className="border px-2 py-1 text-center dark:border-slate-600">
+                        {item.totalActual}
+                      </td>
+                      <td className="border px-2 py-1 text-center dark:border-slate-600">
+                        {item.achievement}%
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
                 onClick={closePopup}
+                className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
               >
                 Close
               </button>
