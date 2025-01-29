@@ -258,9 +258,34 @@ const Dashboard = () => {
     setSelectedDivision(null);
   };
 
+  // [BARU] Data history update (dummy)
+  const updatesHistory = [
+    {
+      division: 'ACCOUNTING',
+      wig: 'WIG 1',
+      leadMeasure: 'Lead Measure A',
+      input: '78',
+      timestamp: '2025-01-28 09:12',
+    },
+    {
+      division: 'DC',
+      wig: 'WIG Distribusi',
+      leadMeasure: 'Lead Measure Distribusi',
+      input: '95',
+      timestamp: '2025-01-28 09:05',
+    },
+    {
+      division: 'BUYER',
+      wig: 'WIG Pembelian',
+      leadMeasure: 'Lead Measure Pembelian',
+      input: '100',
+      timestamp: '2025-01-28 08:50',
+    },
+  ];
+
   return (
     <div
-      className={`${isDarkMode ? 'dark' : ''} min-h-screen bg-gray-50 dark:bg-slate-800 p-4 sm:p-6 transition-colors duration-300`}
+      className={`${isDarkMode ? 'dark' : ''} min-h-screen bg-[#F14A00] dark:bg-slate-900 p-4 sm:p-6 transition-colors duration-300`}
     >
       {/* Header */}
       <header className="bg-white dark:bg-slate-700 shadow-md rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-colors">
@@ -295,11 +320,10 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Global Growth</h2>
           {/* Icon + Percentage in one line with gold color */}
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-2">
-          <ChartNoAxesCombined />
-          <span>{data.globalGrowth}%</span>
-           </div>
+            <ChartNoAxesCombined />
+            <span>{data.globalGrowth}%</span>
+          </div>
         </div>
-
 
         {/* HIGHEST MONTHLY REVENUE */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
@@ -474,6 +498,48 @@ const Dashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+ß
+      {/* [BARU] Tabel History Update (hanya 10 data) */}
+      <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
+        <h2 className="text-lg font-semibold mb-4">Divisi ini baru saja update:</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border text-sm">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-slate-600">
+                <th className="border px-2 py-1 text-left">Divisi</th>
+                <th className="border px-2 py-1 text-left">WIG</th>
+                <th className="border px-2 py-1 text-left">Lead Measure</th>
+                <th className="border px-2 py-1 text-center">Input</th>
+                <th className="border px-2 py-1 text-center">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {updatesHistory
+                .slice(0, 10) // <-- hanya 10 baris data teratas
+                .map((item, idx) => (
+                  <tr key={idx} className="dark:border-slate-600">
+                    <td className="border px-2 py-1 dark:border-slate-600">
+                      {item.division}
+                    </td>
+                    <td className="border px-2 py-1 dark:border-slate-600">
+                      {item.wig}
+                    </td>
+                    <td className="border px-2 py-1 dark:border-slate-600">
+                      {item.leadMeasure}
+                    </td>
+                    <td className="border px-2 py-1 text-center dark:border-slate-600">
+                      {item.input}
+                    </td>
+                    <td className="border px-2 py-1 text-center dark:border-slate-600">
+                      {item.timestamp}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   );
 };
