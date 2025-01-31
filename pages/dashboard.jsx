@@ -139,121 +139,121 @@ const Dashboard = () => {
   }, []);
 
 
-  // Data dummy
-  const data = {
-    globalGrowth: 3.7,
-    revenueMetrics: {
-      highest: 14.8,
-      average: 3.3,
-      lowest: -4.0,
-    },
-    leadMeasure: {
-      total: 60,
-      progress: 56.67,
-      notStarted: 7,
-      inProgress: 19,
-      completed: 34,
-    },
-    wigStatus: {
-      total: 29,
-      progress: 41.38,
-      notStarted: 2,
-      inProgress: 15,
-      completed: 12,
-    },
-    revenueGrowth: [3.5, 12.5, 14.8, -4.0, 5.7, 3.0, 2.3, 0.6, -2.3, -2.8],
-    divisionProgress: [
-      {
-        name: 'ACCOUNTING',
-        progress: 33.33,
-        lmProgress: 45,
-        wigProgress: 55,
-        details: [
-          {
-            wigName: 'WIG 1',
-            leadMeasure: 'Lead Measure A',
-            totalTarget: 100,
-            totalActual: 55,
-            achievement: 55,
-          },
-          {
-            wigName: 'WIG 2',
-            leadMeasure: 'Lead Measure B',
-            totalTarget: 80,
-            totalActual: 40,
-            achievement: 50,
-          },
-        ],
-      },
-      {
-        name: 'ADMIN',
-        progress: 25.93,
-        lmProgress: 30,
-        wigProgress: 40,
-        details: [
-          {
-            wigName: 'WIG 1',
-            leadMeasure: 'Lead Measure X',
-            totalTarget: 90,
-            totalActual: 45,
-            achievement: 50,
-          },
-        ],
-      },
-      {
-        name: 'AUDIT',
-        progress: 100,
-        lmProgress: 90,
-        wigProgress: 100,
-        details: [
-          {
-            wigName: 'WIG 1',
-            leadMeasure: 'Lead Measure Y',
-            totalTarget: 70,
-            totalActual: 70,
-            achievement: 100,
-          },
-          {
-            wigName: 'WIG 2',
-            leadMeasure: 'Lead Measure Z',
-            totalTarget: 50,
-            totalActual: 50,
-            achievement: 100,
-          },
-        ],
-      },
-      {
-        name: 'BUYER',
-        progress: 96.3,
-        lmProgress: 80,
-        wigProgress: 85,
-        details: [
-          {
-            wigName: 'WIG Pembelian',
-            leadMeasure: 'Lead Measure Pembelian',
-            totalTarget: 120,
-            totalActual: 100,
-            achievement: 83.3,
-          },
-        ],
-      },
-      {
-        name: 'DC',
-        progress: 100,
-        lmProgress: 95,
-        wigProgress: 100,
-        details: [
-          {
-            wigName: 'WIG Distribusi',
-            leadMeasure: 'Lead Measure Distribusi',
-            totalTarget: 100,
-            totalActual: 95,
-            achievement: 95,
-          },
-        ],
-      },
-    ],
-  };
+  // // Data dummy
+  // const data = {
+  //   globalGrowth: 3.7,
+  //   revenueMetrics: {
+  //     highest: 14.8,
+  //     average: 3.3,
+  //     lowest: -4.0,
+  //   },
+  //   leadMeasure: {
+  //     total: 60,
+  //     progress: 56.67,
+  //     notStarted: 7,
+  //     inProgress: 19,
+  //     completed: 34,
+  //   },
+  //   wigStatus: {
+  //     total: 29,
+  //     progress: 41.38,
+  //     notStarted: 2,
+  //     inProgress: 15,
+  //     completed: 12,
+  //   },
+  //   revenueGrowth: [3.5, 12.5, 14.8, -4.0, 5.7, 3.0, 2.3, 0.6, -2.3, -2.8],
+  //   divisionProgress: [
+  //     {
+  //       name: 'ACCOUNTING',
+  //       progress: 33.33,
+  //       lmProgress: 45,
+  //       wigProgress: 55,
+  //       details: [
+  //         {
+  //           wigName: 'WIG 1',
+  //           leadMeasure: 'Lead Measure A',
+  //           totalTarget: 100,
+  //           totalActual: 55,
+  //           achievement: 55,
+  //         },
+  //         {
+  //           wigName: 'WIG 2',
+  //           leadMeasure: 'Lead Measure B',
+  //           totalTarget: 80,
+  //           totalActual: 40,
+  //           achievement: 50,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       name: 'ADMIN',
+  //       progress: 25.93,
+  //       lmProgress: 30,
+  //       wigProgress: 40,
+  //       details: [
+  //         {
+  //           wigName: 'WIG 1',
+  //           leadMeasure: 'Lead Measure X',
+  //           totalTarget: 90,
+  //           totalActual: 45,
+  //           achievement: 50,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       name: 'AUDIT',
+  //       progress: 100,
+  //       lmProgress: 90,
+  //       wigProgress: 100,
+  //       details: [
+  //         {
+  //           wigName: 'WIG 1',
+  //           leadMeasure: 'Lead Measure Y',
+  //           totalTarget: 70,
+  //           totalActual: 70,
+  //           achievement: 100,
+  //         },
+  //         {
+  //           wigName: 'WIG 2',
+  //           leadMeasure: 'Lead Measure Z',
+  //           totalTarget: 50,
+  //           totalActual: 50,
+  //           achievement: 100,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       name: 'BUYER',
+  //       progress: 96.3,
+  //       lmProgress: 80,
+  //       wigProgress: 85,
+  //       details: [
+  //         {
+  //           wigName: 'WIG Pembelian',
+  //           leadMeasure: 'Lead Measure Pembelian',
+  //           totalTarget: 120,
+  //           totalActual: 100,
+  //           achievement: 83.3,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       name: 'DC',
+  //       progress: 100,
+  //       lmProgress: 95,
+  //       wigProgress: 100,
+  //       details: [
+  //         {
+  //           wigName: 'WIG Distribusi',
+  //           leadMeasure: 'Lead Measure Distribusi',
+  //           totalTarget: 100,
+  //           totalActual: 95,
+  //           achievement: 95,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // };
 
   // Chart data & options (Revenue Growth)
   const revenueGrowthChartData = {
@@ -261,11 +261,11 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Revenue Growth (%)',
-        data: dataRevenueGrowth.growth,
-        backgroundColor: data.revenueGrowth.map((value) =>
+        data: dataRevenueGrowth.growth ?? [],
+        backgroundColor: (dataRevenueGrowth.growth ?? []).map((value) =>
           value < 0 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'
         ),
-        borderColor: data.revenueGrowth.map((value) =>
+        borderColor: (dataRevenueGrowth.growth ?? []).map((value) =>
           value < 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
         ),
         borderWidth: 1,
@@ -425,7 +425,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Highest Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
             <TrendingUp />
-            <span>{data.revenueMetrics.highest}%</span>
+            <span>{dataGrowth.revenueMetrics?.highest ?? 'N/A'}%</span>
           </div>
         </div>
 
@@ -434,7 +434,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Average Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
             <ChartLine />
-            <span>{data.revenueMetrics.average}%</span>
+            <span>{dataGrowth.revenueMetrics?.average ?? 'N/A'}%</span>
           </div>
         </div>
 
@@ -443,7 +443,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Lowest Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400 mt-2">
             <TrendingDown />
-            <span>{data.revenueMetrics.lowest}%</span>
+            <span>{dataGrowth.revenueMetrics?.lowest ?? 'N/A'}%</span>
           </div>
         </div>
       </div>
