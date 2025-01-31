@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -18,10 +18,126 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedDivision, setSelectedDivision] = useState(null);
+  const [dataGrowth, setdataGrowth] = useState([]);
+  const [dataRevenueGrowth, setDataRevenueGrowth] = useState([]);
+  const [dataProgres, setDataProgres] = useState([]);
+  const [dataLeadMeasureInput, setDataLeadMeasureInput] = useState([]);
+  const [dataWigStatus, setDataWigStatus] = useState([]);
+  const [dataLeadMeasureG, setDataLeadMeasureG] = useState([]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  useEffect(() => { 
+    const fetchGrowth = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/growth`
+        );
+        const data = await response.json();
+        setdataGrowth(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchGrowth();
+
+    const fetchRevenueGrowth = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/getRevenueGrowth`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDataRevenueGrowth(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchRevenueGrowth();
+
+    const fetchProgres = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/getDivisionProgress`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDataProgres(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchProgres();
+
+    const fetchLeadMeasureInput = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/getLeadMeasureInput`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDataLeadMeasureInput(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchLeadMeasureInput();
+
+    const fetchWigStatus = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/getWigStatus`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDataWigStatus(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchWigStatus();
+
+    
+    const fetchLeadMeasure = async () => {
+      try {
+        const response = await fetch(
+          `http://202.58.199.194:8080/api-appit/public/wig/getLeadMeasureG`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDataLeadMeasureG(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching WIG options:", error);
+      }
+    };
+
+    fetchLeadMeasure();
+
+  }, []);
+
 
   // Data dummy
   const data = {
@@ -145,7 +261,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Revenue Growth (%)',
-        data: data.revenueGrowth,
+        data: dataRevenueGrowth.growth,
         backgroundColor: data.revenueGrowth.map((value) =>
           value < 0 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'
         ),
@@ -156,6 +272,8 @@ const Dashboard = () => {
       },
     ],
   };
+
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -174,21 +292,21 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Not Started',
-        data: [data.leadMeasure.notStarted],
+        data: [dataLeadMeasureG.notStarted],
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,
       },
       {
         label: 'In Progress',
-        data: [data.leadMeasure.inProgress],
+        data: [dataLeadMeasureG.inProgress],
         backgroundColor: 'rgba(255, 206, 86, 0.2)',
         borderColor: 'rgba(255, 206, 86, 1)',
         borderWidth: 1,
       },
       {
         label: 'Completed',
-        data: [data.leadMeasure.completed],
+        data: [dataLeadMeasureG.completed],
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
@@ -215,27 +333,29 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Not Started',
-        data: [data.wigStatus.notStarted],
+        data: [dataWigStatus.notStarted],
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,
       },
       {
         label: 'In Progress',
-        data: [data.wigStatus.inProgress],
+        data: [dataWigStatus.inProgress],
         backgroundColor: 'rgba(255, 206, 86, 0.2)',
         borderColor: 'rgba(255, 206, 86, 1)',
         borderWidth: 1,
       },
       {
         label: 'Completed',
-        data: [data.wigStatus.completed],
+        data: [dataWigStatus.completed],
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
       },
     ],
   };
+
+
   const wigStatusChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -257,31 +377,6 @@ const Dashboard = () => {
   const closePopup = () => {
     setSelectedDivision(null);
   };
-
-  // [BARU] Data history update (dummy)
-  const updatesHistory = [
-    {
-      division: 'ACCOUNTING',
-      wig: 'WIG 1',
-      leadMeasure: 'Lead Measure A',
-      input: '78',
-      timestamp: '2025-01-28 09:12',
-    },
-    {
-      division: 'DC',
-      wig: 'WIG Distribusi',
-      leadMeasure: 'Lead Measure Distribusi',
-      input: '95',
-      timestamp: '2025-01-28 09:05',
-    },
-    {
-      division: 'BUYER',
-      wig: 'WIG Pembelian',
-      leadMeasure: 'Lead Measure Pembelian',
-      input: '100',
-      timestamp: '2025-01-28 08:50',
-    },
-  ];
 
   return (
     <div
@@ -321,7 +416,7 @@ const Dashboard = () => {
           {/* Icon + Percentage in one line with gold color */}
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-2">
             <ChartNoAxesCombined />
-            <span>{data.globalGrowth}%</span>
+            <span>{dataGrowth.globalGrowth}%</span>
           </div>
         </div>
 
@@ -358,7 +453,7 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">Leadmeasure Status</h2>
           <p className="text-xl sm:text-2xl font-bold mb-4">
-            Progress: {data.leadMeasure.progress}%
+            Progress: {dataLeadMeasureG.progress}%
           </p>
           <div className="flex-1" style={{ minHeight: '250px' }}>
             <Bar data={leadMeasureChartData} options={leadMeasureChartOptions} />
@@ -366,15 +461,15 @@ const Dashboard = () => {
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="text-center">
               <p className="text-sm font-semibold">Not Started</p>
-              <p className="text-lg font-bold text-red-500">{data.leadMeasure.notStarted}</p>
+              <p className="text-lg font-bold text-red-500">{dataLeadMeasureG.notStarted}</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold">In Progress</p>
-              <p className="text-lg font-bold text-yellow-500">{data.leadMeasure.inProgress}</p>
+              <p className="text-lg font-bold text-yellow-500">{dataLeadMeasureG.inProgress}</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold">Completed</p>
-              <p className="text-lg font-bold text-green-500">{data.leadMeasure.completed}</p>
+              <p className="text-lg font-bold text-green-500">{dataLeadMeasureG.completed}</p>
             </div>
           </div>
         </div>
@@ -382,7 +477,7 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">WIG Status</h2>
           <p className="text-xl sm:text-2xl font-bold mb-4">
-            Progress: {data.wigStatus.progress}%
+            Progress: {(dataWigStatus.progress || 0).toString()}%
           </p>
           <div className="flex-1" style={{ minHeight: '250px' }}>
             <Bar data={wigStatusChartData} options={wigStatusChartOptions} />
@@ -390,15 +485,15 @@ const Dashboard = () => {
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="text-center">
               <p className="text-sm font-semibold">Not Started</p>
-              <p className="text-lg font-bold text-red-500">{data.wigStatus.notStarted}</p>
+              <p className="text-lg font-bold text-red-500">{dataWigStatus.notStarted}</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold">In Progress</p>
-              <p className="text-lg font-bold text-yellow-500">{data.wigStatus.inProgress}</p>
+              <p className="text-lg font-bold text-yellow-500">{dataWigStatus.inProgress}</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold">Completed</p>
-              <p className="text-lg font-bold text-green-500">{data.wigStatus.completed}</p>
+              <p className="text-lg font-bold text-green-500">{dataWigStatus.completed}</p>
             </div>
           </div>
         </div>
@@ -415,7 +510,7 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold mb-4">Division Progress</h2>
           <div className="space-y-2">
-            {data.divisionProgress.map((division, index) => (
+            {dataProgres.map((division, index) => (
               <div key={index}>
                 <p
                   className="text-sm font-semibold cursor-pointer hover:text-blue-500"
@@ -498,7 +593,7 @@ const Dashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
-ß
+      
       {/* [BARU] Tabel History Update (hanya 10 data) */}
       <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
         <h2 className="text-lg font-semibold mb-4">Divisi ini baru saja update:</h2>
@@ -509,12 +604,12 @@ const Dashboard = () => {
                 <th className="border px-2 py-1 text-left">Divisi</th>
                 <th className="border px-2 py-1 text-left">WIG</th>
                 <th className="border px-2 py-1 text-left">Lead Measure</th>
-                <th className="border px-2 py-1 text-center">Input</th>
+                <th className="border px-2 py-1 text-center">Input Progress</th>
                 <th className="border px-2 py-1 text-center">Timestamp</th>
               </tr>
             </thead>
             <tbody>
-              {updatesHistory
+              {dataLeadMeasureInput
                 .slice(0, 10) // <-- hanya 10 baris data teratas
                 .map((item, idx) => (
                   <tr key={idx} className="dark:border-slate-600">
