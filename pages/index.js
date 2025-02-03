@@ -1,12 +1,14 @@
+"use client";
+
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/router";
+import Tindakan from "./tindakan";
 
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const saveToLocalStorage = (key, value) => {
     const now = new Date();
@@ -31,13 +33,17 @@ export default function Home() {
       saveToLocalStorage("nama_divisi", data.nama_divisi);
       saveToLocalStorage("divisi", data.divisi);
 
-      router.push("/tindakan");
+      setIsLoggedIn(true);
       console.log(response.data);
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please check your credentials and try again.");
     }
   };
+
+  if (isLoggedIn) {
+    return <Tindakan />;
+  }
 
   return (
     <div className={`flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-4`}>

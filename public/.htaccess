@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^appit/login$ /appit [R=301,L]

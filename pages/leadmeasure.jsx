@@ -228,7 +228,7 @@ const Leadmeasure = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full lg:w-1/2 p-2 m-2">
+      <div className="bg-white p-8 rounded shadow-md w-full lg:w-1/2 m-2">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold mb-6 text-gray-800 underline">
@@ -382,7 +382,7 @@ const Leadmeasure = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between pt-4">
+        {/* <div className="flex items-center justify-between pt-4">
           <button
             className="font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
@@ -397,7 +397,7 @@ const Leadmeasure = () => {
           >
             Tambah Baris
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
