@@ -380,8 +380,8 @@ const Dashboard = () => {
 
   return (
     <div
-      className={`${isDarkMode ? 'dark' : ''} min-h-screen bg-[#F14A00] dark:bg-slate-900 p-4 sm:p-6 transition-colors duration-300`}
-    >
+    className={`${isDarkMode ? 'dark' : ''} min-h-screen bg-gradient-to-r from-[#F14A00] to-[#FF8C00] dark:bg-slate-900 p-4 sm:p-6 transition-colors duration-300`}
+  >
       {/* Header */}
       <header className="bg-white dark:bg-slate-700 shadow-md rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-colors">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -538,61 +538,58 @@ const Dashboard = () => {
 
       {/* Popup Division */}
       <AnimatePresence>
-        {selectedDivision && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-          >
-            <div className="bg-white dark:bg-slate-700 dark:text-gray-200 rounded-lg p-4 sm:p-6 shadow-lg w-full max-w-md max-h-[80vh] overflow-auto transition-colors">
-              <h2 className="text-lg font-bold mb-4">{selectedDivision.name} Details</h2>
-              <p className="mb-2">
-                <strong>Lead Measure Progress:</strong> {selectedDivision.lmProgress}%
-              </p>
-              <p className="mb-4">
-                <strong>WIG Progress:</strong> {selectedDivision.wigProgress}%
-              </p>
+  {selectedDivision && (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+    >
+      {/* Modal container dengan max height dan overflow-y untuk scroll */}
+      <div className="bg-white dark:bg-slate-700 dark:text-gray-200 rounded-lg p-4 sm:p-6 shadow-lg transition-colors max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-bold mb-4">{selectedDivision.name} Details</h2>
+        <p className="mb-2">
+          <strong>Lead Measure Progress:</strong> {selectedDivision.lmProgress}%
+        </p>
+        <p className="mb-4">
+          <strong>WIG Progress:</strong> {selectedDivision.wigProgress}%
+        </p>
 
-              <table className="min-w-full border text-sm mb-4">
-                <thead>
-                  <tr className="bg-gray-100 dark:bg-slate-600">
-                    <th className="border px-2 py-1 text-left">WIG</th>
-                    <th className="border px-2 py-1 text-left">Lead Measure</th>
-                    <th className="border px-2 py-1 text-center">Target</th>
-                    <th className="border px-2 py-1 text-center">Actual</th>
-                    <th className="border px-2 py-1 text-center">Achievement (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedDivision.details?.map((item, idx) => (
-                    <tr key={idx} className="dark:border-slate-600">
-                      <td className="border px-2 py-1 dark:border-slate-600">{item.wigName}</td>
-                      <td className="border px-2 py-1 dark:border-slate-600">{item.leadMeasure}</td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">
-                        {item.totalTarget}
-                      </td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">
-                        {item.totalActual}
-                      </td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">
-                        {item.achievement}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <table className="min-w-full border text-sm mb-4">
+          <thead>
+            <tr className="bg-gray-100 dark:bg-slate-600">
+              <th className="border px-2 py-1 text-left">WIG</th>
+              <th className="border px-2 py-1 text-left">Lead Measure</th>
+              <th className="border px-2 py-1 text-center">Target</th>
+              <th className="border px-2 py-1 text-center">Actual</th>
+              <th className="border px-2 py-1 text-center">Achievement (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedDivision.details?.map((item, idx) => (
+              <tr key={idx} className="dark:border-slate-600">
+                <td className="border px-2 py-1 dark:border-slate-600">{item.wigName}</td>
+                <td className="border px-2 py-1 dark:border-slate-600">{item.leadMeasure}</td>
+                <td className="border px-2 py-1 text-center dark:border-slate-600">{item.totalTarget}</td>
+                <td className="border px-2 py-1 text-center dark:border-slate-600">{item.totalActual}</td>
+                <td className="border px-2 py-1 text-center dark:border-slate-600">{item.achievement}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-              <button
-                onClick={closePopup}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <button
+          onClick={closePopup}
+          className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          Close
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
       
       {/* [BARU] Tabel History Update (hanya 10 data) */}
       <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
