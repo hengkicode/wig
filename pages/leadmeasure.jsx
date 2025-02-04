@@ -231,11 +231,11 @@ const Leadmeasure = () => {
 
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full lg:w-1/2 m-2">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white p-4 md:p-8 rounded shadow-md w-full lg:w-1/2">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8">
           <div>
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 underline">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800 underline">
               Input Lead Measure
             </h2>
           </div>
@@ -268,127 +268,129 @@ const Leadmeasure = () => {
             List Lead Measure <br />
             {selectedWig ? `(${selectedWig.label})` : ""}
           </label>
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">No</th>
-                <th className="px-4 py-2">Lead Measure</th>
-                <th className="px-4 py-2">Sisa Target</th>
-                <th className="px-4 py-2">Rill Target</th>
-                <th className="px-4 py-2">Input Actual</th>
-                <th className="px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leadmeasure.map((item, index) => (
-                <tr key={index}>
-                  <td className="border px-4 py-2">{index + 1}</td>
-                  <td className="border px-4 py-2">
-                    {item.isNew ? (
-                      <input
-                        type="text"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={item.leadmeasure}
-                        onChange={(e) => {
-                          const updatedLeadmeasure = [...leadmeasure];
-                          updatedLeadmeasure[index].leadmeasure =
-                            e.target.value;
-                          setLeadMeasure(updatedLeadmeasure);
-                        }}
-                      />
-                    ) : (
-                      item.leadmeasure
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {item.isNew ? (
-                      <input
-                        type="number"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={item.sisa_target}
-                        readOnly
-                      />
-                    ) : (
-                      item.sisa_target
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {item.isNew ? (
-                      <input
-                        type="number"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={item.rill_target}
-                        onChange={(e) =>
-                          handleRillTargetChange(index, e.target.value)
-                        }
-                      />
-                    ) : (
-                      item.rill_target
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {!item.isNew && (
-                      <input
-                        type="number"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={inputValues[item.id_leadmeasure] || ""}
-                        onChange={(e) =>
-                          handleInputChange(item.id_leadmeasure, e.target.value)
-                        }
-                      />
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {item.isNew ? (
-                      <>
-                        <button
-                          onClick={saveBarisBaru}
-                          className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => {
-                            const updatedLeadmeasure = leadmeasure.filter(
-                              (row) =>
-                                row.id_leadmeasure !== item.id_leadmeasure
-                            );
-                            setLeadMeasure(updatedLeadmeasure);
-                            const updatedInputValues = { ...inputValues };
-                            delete updatedInputValues[item.id_leadmeasure];
-                            setInputValues(updatedInputValues);
-                          }}
-                          className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                        >
-                          Hapus
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => updateLeadmeasure(item.id_leadmeasure)}
-                          className="bg-green-500 text-xs hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
-                        >
-                          Update
-                        </button>
-                        <button
-                          onClick={() => hapusLeadmeasure(item.id_leadmeasure)}
-                          className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                        >
-                          Hapus
-                        </button>
-                      </>
-                    )}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full">
+              <thead>
+                <tr>
+                  <th className="px-2 md:px-4 py-2">No</th>
+                  <th className="px-2 md:px-4 py-2">Lead Measure</th>
+                  <th className="px-2 md:px-4 py-2">Sisa Target</th>
+                  <th className="px-2 md:px-4 py-2">Rill Target</th>
+                  <th className="px-2 md:px-4 py-2">Input Actual</th>
+                  <th className="px-2 md:px-4 py-2">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {leadmeasure.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border px-2 md:px-4 py-2">{index + 1}</td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {item.isNew ? (
+                        <input
+                          type="text"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={item.leadmeasure}
+                          onChange={(e) => {
+                            const updatedLeadmeasure = [...leadmeasure];
+                            updatedLeadmeasure[index].leadmeasure =
+                              e.target.value;
+                            setLeadMeasure(updatedLeadmeasure);
+                          }}
+                        />
+                      ) : (
+                        item.leadmeasure
+                      )}
+                    </td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {item.isNew ? (
+                        <input
+                          type="number"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={item.sisa_target}
+                          readOnly
+                        />
+                      ) : (
+                        item.sisa_target
+                      )}
+                    </td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {item.isNew ? (
+                        <input
+                          type="number"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={item.rill_target}
+                          onChange={(e) =>
+                            handleRillTargetChange(index, e.target.value)
+                          }
+                        />
+                      ) : (
+                        item.rill_target
+                      )}
+                    </td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {!item.isNew && (
+                        <input
+                          type="number"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={inputValues[item.id_leadmeasure] || ""}
+                          onChange={(e) =>
+                            handleInputChange(item.id_leadmeasure, e.target.value)
+                          }
+                        />
+                      )}
+                    </td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {item.isNew ? (
+                        <>
+                          <button
+                            onClick={saveBarisBaru}
+                            className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              const updatedLeadmeasure = leadmeasure.filter(
+                                (row) =>
+                                  row.id_leadmeasure !== item.id_leadmeasure
+                              );
+                              setLeadMeasure(updatedLeadmeasure);
+                              const updatedInputValues = { ...inputValues };
+                              delete updatedInputValues[item.id_leadmeasure];
+                              setInputValues(updatedInputValues);
+                            }}
+                            className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                          >
+                            Hapus
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => updateLeadmeasure(item.id_leadmeasure)}
+                            className="bg-green-500 text-xs hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={() => hapusLeadmeasure(item.id_leadmeasure)}
+                            className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                          >
+                            Hapus
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* <div className="flex items-center justify-between pt-4">
+        {/* <div className="flex flex-col md:flex-row items-center justify-between pt-4">
           <button
-            className="cursor-pointer font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="cursor-pointer font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0"
             type="button"
             onClick={tindakan}
           >
