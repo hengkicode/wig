@@ -29,6 +29,7 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  // [1] STATE
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [dataGrowth, setdataGrowth] = useState([]);
@@ -38,10 +39,19 @@ const Dashboard = () => {
   const [dataWigStatus, setDataWigStatus] = useState([]);
   const [dataLeadMeasureG, setDataLeadMeasureG] = useState([]);
 
+  // [2] TANGGAL REAL-TIME DENGAN FORMAT DD/MM/YYYY
+  const currentDate = new Date();
+  const day = currentDate.getDate().toString().padStart(2, "0");
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+  const year = currentDate.getFullYear();
+  const formattedDate = `${day}/${month}/${year}`;
+
+  // [3] HANDLER UNTUK DARK MODE
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  // [4] USEEFFECT UNTUK MEMANGGIL DATA API
   useEffect(() => {
     const fetchGrowth = async () => {
       try {
@@ -149,136 +159,9 @@ const Dashboard = () => {
     fetchLeadMeasure();
   }, []);
 
-  // // Data dummy
-  // const data = {
-  //   globalGrowth: 3.7,
-  //   revenueMetrics: {
-  //     highest: 14.8,
-  //     average: 3.3,
-  //     lowest: -4.0,
-  //   },
-  //   leadMeasure: {
-  //     total: 60,
-  //     progress: 56.67,
-  //     notStarted: 7,
-  //     inProgress: 19,
-  //     completed: 34,
-  //   },
-  //   wigStatus: {
-  //     total: 29,
-  //     progress: 41.38,
-  //     notStarted: 2,
-  //     inProgress: 15,
-  //     completed: 12,
-  //   },
-  //   revenueGrowth: [3.5, 12.5, 14.8, -4.0, 5.7, 3.0, 2.3, 0.6, -2.3, -2.8],
-  //   divisionProgress: [
-  //     {
-  //       name: 'ACCOUNTING',
-  //       progress: 33.33,
-  //       lmProgress: 45,
-  //       wigProgress: 55,
-  //       details: [
-  //         {
-  //           wigName: 'WIG 1',
-  //           leadMeasure: 'Lead Measure A',
-  //           totalTarget: 100,
-  //           totalActual: 55,
-  //           achievement: 55,
-  //         },
-  //         {
-  //           wigName: 'WIG 2',
-  //           leadMeasure: 'Lead Measure B',
-  //           totalTarget: 80,
-  //           totalActual: 40,
-  //           achievement: 50,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'ADMIN',
-  //       progress: 25.93,
-  //       lmProgress: 30,
-  //       wigProgress: 40,
-  //       details: [
-  //         {
-  //           wigName: 'WIG 1',
-  //           leadMeasure: 'Lead Measure X',
-  //           totalTarget: 90,
-  //           totalActual: 45,
-  //           achievement: 50,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'AUDIT',
-  //       progress: 100,
-  //       lmProgress: 90,
-  //       wigProgress: 100,
-  //       details: [
-  //         {
-  //           wigName: 'WIG 1',
-  //           leadMeasure: 'Lead Measure Y',
-  //           totalTarget: 70,
-  //           totalActual: 70,
-  //           achievement: 100,
-  //         },
-  //         {
-  //           wigName: 'WIG 2',
-  //           leadMeasure: 'Lead Measure Z',
-  //           totalTarget: 50,
-  //           totalActual: 50,
-  //           achievement: 100,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'BUYER',
-  //       progress: 96.3,
-  //       lmProgress: 80,
-  //       wigProgress: 85,
-  //       details: [
-  //         {
-  //           wigName: 'WIG Pembelian',
-  //           leadMeasure: 'Lead Measure Pembelian',
-  //           totalTarget: 120,
-  //           totalActual: 100,
-  //           achievement: 83.3,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'DC',
-  //       progress: 100,
-  //       lmProgress: 95,
-  //       wigProgress: 100,
-  //       details: [
-  //         {
-  //           wigName: 'WIG Distribusi',
-  //           leadMeasure: 'Lead Measure Distribusi',
-  //           totalTarget: 100,
-  //           totalActual: 95,
-  //           achievement: 95,
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // };
-
-  // Chart data & options (Revenue Growth)
+  // [5] CHART DATA & OPTIONS
   const revenueGrowthChartData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-    ],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
     datasets: [
       {
         label: "Revenue Growth (%)",
@@ -306,7 +189,7 @@ const Dashboard = () => {
     },
   };
 
-  // Lead Measure chart
+  // LEAD MEASURE CHART
   const leadMeasureChartData = {
     labels: ["Lead Measure"],
     datasets: [
@@ -347,7 +230,7 @@ const Dashboard = () => {
     },
   };
 
-  // WIG Status chart
+  // WIG STATUS CHART
   const wigStatusChartData = {
     labels: ["WIG Status"],
     datasets: [
@@ -389,7 +272,7 @@ const Dashboard = () => {
     },
   };
 
-  // Handlers
+  // [6] HANDLER POPUP DIVISION
   const handleDivisionClick = (division) => {
     setSelectedDivision(division);
   };
@@ -397,6 +280,7 @@ const Dashboard = () => {
     setSelectedDivision(null);
   };
 
+  // [7] RETURN JSX
   return (
     <div
       className={`${
@@ -408,17 +292,29 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <Image
-              src="wig/logo.png"
+              src="/wig/logo.png" // Pastikan logo berada di folder public/wig/
               alt="Deskripsi Gambar"
-              width={100} // Lebar gambar dalam piksel
-              height={100} // Tinggi gambar dalam piksel
+              width={100}
+              height={100}
             />
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
+            {/* Shimmer pada judul */}
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 shimmer-text">
               Dashboard Workshop 2024
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-gray-500 dark:text-gray-200">26/01/2025</p>
+            {/* Tanggal dengan animasi motion + shimmer (opsional di shimmer) */}
+            <motion.p
+              className="text-gray-500 dark:text-gray-200"
+              animate={{ y: [0, -5, 0] }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                repeatType: "loop",
+              }}
+            >
+              {formattedDate}
+            </motion.p>
             <button
               onClick={toggleDarkMode}
               className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
@@ -434,10 +330,12 @@ const Dashboard = () => {
         {/* GLOBAL GROWTH */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
           <h2 className="text-lg font-semibold">Global Growth</h2>
-          {/* Icon + Percentage in one line with gold color */}
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-2">
             <ChartNoAxesCombined />
-            <span>{dataGrowth.globalGrowth}%</span>
+            {/* Efek cahaya pada persentase */}
+            <span className="shimmer-text">
+              {dataGrowth.globalGrowth}%
+            </span>
           </div>
         </div>
 
@@ -446,7 +344,9 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Highest Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
             <TrendingUp />
-            <span>{dataGrowth.revenueMetrics?.highest ?? "N/A"}%</span>
+            <span className="shimmer-text">
+              {dataGrowth.revenueMetrics?.highest ?? "N/A"}%
+            </span>
           </div>
         </div>
 
@@ -455,7 +355,9 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Average Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
             <ChartLine />
-            <span>{dataGrowth.revenueMetrics?.average ?? "N/A"}%</span>
+            <span className="shimmer-text">
+              {dataGrowth.revenueMetrics?.average ?? "N/A"}%
+            </span>
           </div>
         </div>
 
@@ -464,23 +366,23 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold">Lowest Monthly Revenue</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400 mt-2">
             <TrendingDown />
-            <span>{dataGrowth.revenueMetrics?.lowest ?? "N/A"}%</span>
+            <span className="shimmer-text">
+              {dataGrowth.revenueMetrics?.lowest ?? "N/A"}%
+            </span>
           </div>
         </div>
       </div>
 
       {/* Lead Measure & WIG Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        {/* LEAD MEASURE */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">Leadmeasure Status</h2>
           <p className="text-xl sm:text-2xl font-bold mb-4">
             Progress: {dataLeadMeasureG.progress}%
           </p>
           <div className="flex-1" style={{ minHeight: "250px" }}>
-            <Bar
-              data={leadMeasureChartData}
-              options={leadMeasureChartOptions}
-            />
+            <Bar data={leadMeasureChartData} options={leadMeasureChartOptions} />
           </div>
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="text-center">
@@ -504,6 +406,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* WIG STATUS */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
           <h2 className="text-lg font-semibold">WIG Status</h2>
           <p className="text-xl sm:text-2xl font-bold mb-4">
@@ -685,6 +588,38 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+
+      {/* CSS Shimmer Effect */}
+      <style jsx>{`
+        .shimmer-text {
+          position: relative;
+          overflow: hidden;
+          display: inline-block;
+        }
+        .shimmer-text::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -200%;
+          width: 200%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+          0% {
+            left: -200%;
+          }
+          100% {
+            left: 200%;
+          }
+        }
+      `}</style>
     </div>
   );
 };
