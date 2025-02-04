@@ -34,10 +34,17 @@ export default function Home() {
       saveToLocalStorage("divisi", data.divisi);
 
       setIsLoggedIn(true);
+      setError(""); // Clear any previous error messages
       console.log(response.data);
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed. Please check your credentials and try again.");
+      if (err.response) {
+        console.error("Login error:", err.response.data);
+        setError("Maaf Username dan password masukan salah !");
+      } else {
+        console.error("Login error:", err);
+        setError("An unexpected error occurred. Please try again later.");
+      }
+      setIsLoggedIn(false); // Ensure the user is not logged in
     }
   };
 

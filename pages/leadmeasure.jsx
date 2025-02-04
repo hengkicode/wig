@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { useRouter } from "next/router";
 
 const Leadmeasure = () => {
-  const router = useRouter();
   const [wigOptions, setWigOptions] = useState([]);
   const [selectedWig, setSelectedWig] = useState(null);
   const [divisi, setDivisi] = useState(null);
@@ -226,6 +224,12 @@ const Leadmeasure = () => {
     setLeadMeasure(updatedLeadmeasure);
   };
 
+  // Ubah fungsi back untuk navigasi ke komponen tindakan.jsx
+  const tindakan = () => {
+    navigate("/tindakan"); // Pastikan route "/tindakan" telah dikonfigurasi untuk memuat tindakan.jsx
+  };
+
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full lg:w-1/2 m-2">
@@ -384,9 +388,9 @@ const Leadmeasure = () => {
 
         {/* <div className="flex items-center justify-between pt-4">
           <button
-            className="font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="cursor-pointer font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
-            onClick={() => router.back()}
+            onClick={tindakan}
           >
             Back
           </button>

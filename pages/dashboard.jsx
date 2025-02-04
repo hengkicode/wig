@@ -28,6 +28,7 @@ ChartJS.register(
   Legend
 );
 
+
 const Dashboard = () => {
   // [1] STATE
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -161,7 +162,7 @@ const Dashboard = () => {
 
   // [5] CHART DATA & OPTIONS
   const revenueGrowthChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+    labels: dataRevenueGrowth.months ?? [],
     datasets: [
       {
         label: "Revenue Growth (%)",
@@ -321,6 +322,7 @@ const Dashboard = () => {
             >
               {isDarkMode ? "Light Mode" : "Dark Mode"}
             </button>
+            {/* <div   onClick={tindakan} className="cursor-pointer font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">BACK</div> */}
           </div>
         </div>
       </header>
