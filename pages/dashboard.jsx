@@ -331,7 +331,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
         {/* GLOBAL GROWTH */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md transition-colors">
-          <h2 className="text-lg font-semibold">Global Growth</h2>
+          <h2 className="text-lg font-semibold">Revenue Growth</h2>
           <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-2">
             <ChartNoAxesCombined />
             {/* Efek cahaya pada persentase */}
@@ -379,7 +379,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
         {/* LEAD MEASURE */}
         <div className="bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
-          <h2 className="text-lg font-semibold">Leadmeasure Status</h2>
+          <h2 className="text-lg font-semibold">Lead Measure Status</h2>
           <p className="text-xl sm:text-2xl font-bold mb-4">
             Progress: {dataLeadMeasureG.progress}%
           </p>
@@ -443,7 +443,7 @@ const Dashboard = () => {
       {/* Revenue Growth & Division Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
         <div className="lg:col-span-2 bg-white dark:bg-slate-700 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col transition-colors">
-          <h2 className="text-lg font-semibold mb-4">Revenue Growth 2024</h2>
+          <h2 className="text-lg font-semibold mb-4">Monthly Growth 2024</h2>
           <div className="flex-1" style={{ minHeight: "300px" }}>
             <Bar data={revenueGrowthChartData} options={chartOptions} />
           </div>

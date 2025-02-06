@@ -274,9 +274,9 @@ const Leadmeasure = () => {
                 <tr>
                   <th className="px-2 md:px-4 py-2">No</th>
                   <th className="px-2 md:px-4 py-2">Lead Measure</th>
-                  <th className="px-2 md:px-4 py-2">Sisa Target</th>
-                  <th className="px-2 md:px-4 py-2">Rill Target</th>
-                  <th className="px-2 md:px-4 py-2">Input Actual</th>
+                  <th className="px-2 md:px-4 py-2">Gap</th>
+                  <th className="px-2 md:px-4 py-2">Target</th>
+                  <th className="px-2 md:px-4 py-2">Actual</th>
                   <th className="px-2 md:px-4 py-2">Action</th>
                 </tr>
               </thead>
