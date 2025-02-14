@@ -348,7 +348,7 @@ const Leadmeasure = () => {
                           >
                             Save
                           </button>
-                          <button
+                          {/* <button
                             onClick={() => {
                               const updatedLeadmeasure = leadmeasure.filter(
                                 (row) =>
@@ -362,7 +362,7 @@ const Leadmeasure = () => {
                             className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
                           >
                             Hapus
-                          </button>
+                          </button> */}
                         </>
                       ) : (
                         <>
@@ -372,12 +372,12 @@ const Leadmeasure = () => {
                           >
                             Update
                           </button>
-                          <button
+                          {/* <button
                             onClick={() => hapusLeadmeasure(item.id_leadmeasure)}
                             className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
                           >
                             Hapus
-                          </button>
+                          </button> */}
                         </>
                       )}
                     </td>

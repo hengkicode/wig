@@ -1,20 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Tindakan from "./tindakan";
+import Dashboard from "./dashboard";
 
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGM, setIsGM] = useState(false);
+
+  useEffect(() => {
+    // Cek apakah sudah login sebelumnya
+    const storedData = localStorage.getItem("username");
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData?.value) {
+          setIsLoggedIn(true);
+          if (parsedData.value === "gm") {
+            setIsGM(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+      }
+    }
+  }, []);
 
   const saveToLocalStorage = (key, value) => {
     const now = new Date();
     const item = {
       value: value,
-      expiry: now.getTime() + 3 * 60 * 60 * 1000, // 3 hours in milliseconds
+      expiry: now.getTime() + 3 * 60 * 60 * 1000, // 3 jam
     };
     localStorage.setItem(key, JSON.stringify(item));
   };
@@ -34,26 +54,31 @@ export default function Home() {
       saveToLocalStorage("divisi", data.divisi);
 
       setIsLoggedIn(true);
-      setError(""); // Clear any previous error messages
+      setError("");
+
+      if (data.username === "gm") {
+        setIsGM(true);
+      }
+
       console.log(response.data);
     } catch (err) {
       if (err.response) {
         console.error("Login error:", err.response.data);
-        setError("Maaf Username dan password masukan salah !");
+        setError("Maaf Username dan Password yang Anda masukkan salah!");
       } else {
         console.error("Login error:", err);
-        setError("An unexpected error occurred. Please try again later.");
+        setError("Terjadi kesalahan. Silakan coba lagi nanti.");
       }
-      setIsLoggedIn(false); // Ensure the user is not logged in
+      setIsLoggedIn(false);
     }
   };
 
   if (isLoggedIn) {
-    return <Tindakan />;
+    return isGM ? <Dashboard /> : <Tindakan />;
   }
 
   return (
-    <div className={`flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-4`}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-4">
       <form onSubmit={handleLogin} className="w-full max-w-sm p-5 border border-gray-300 rounded-lg bg-white shadow-md">
         <div className="mb-4">
           <label htmlFor="username" className="block mb-2 text-gray-700">Username:</label>
