@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Dashboard from "./dashboard";
 import LeadMeasure from "./leadmeasure";
+import Index from "./index";
 
 export default function Tindakan() {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -27,6 +28,14 @@ export default function Tindakan() {
     }
   }, []);
 
+  const logout = () => {
+    localStorage.clear('username');
+    localStorage.clear('nama_devisi');
+    localStorage.clear('divisi');
+    localStorage.clear('id')
+    window.location.reload();
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       {username !== "gm" ? (
@@ -43,6 +52,13 @@ export default function Tindakan() {
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
             >
               Dashboard
+            </button>
+
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+            >
+              Logout
             </button>
           </div>
         </div>

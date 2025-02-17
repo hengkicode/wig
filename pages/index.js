@@ -34,7 +34,7 @@ export default function Home() {
     const now = new Date();
     const item = {
       value: value,
-      expiry: now.getTime() + 3 * 60 * 60 * 1000, // 3 jam
+      expiry: now.getTime() + 1 * 60 * 60 * 1000, // 3 jam
     };
     localStorage.setItem(key, JSON.stringify(item));
   };
