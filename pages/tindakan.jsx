@@ -17,8 +17,8 @@ export default function Tindakan() {
         if (parsedData?.value) {
           setUsername(parsedData.value);
 
-          // Jika username adalah "gm", langsung ke Dashboard
-          if (parsedData.value == "gm") {
+          // Jika username adalah "gm" atau "indy", langsung ke Dashboard
+          if (parsedData.value === "gm" || parsedData.value === "indy") {
             setActiveComponent("dashboard");
           }
         }
@@ -38,7 +38,7 @@ export default function Tindakan() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      {username !== "gm" ? (
+      {username !== "gm" && username !== "indy" ? (
         <div className="text-center flex flex-col items-center justify-center p-4">
           <div className="flex space-x-4 mb-4">
             <button
