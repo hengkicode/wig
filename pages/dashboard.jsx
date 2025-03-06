@@ -148,7 +148,7 @@ const Dashboard = () => {
           "http://202.58.199.194:8080/api-appit/public/wig/getLeadMeasureG"
         );
         if (!leadMeasureGRes.ok)
-          throw new Error(Melakukan Analisa data berdasarkan hasil sampling 100 item`HTTP error! status: ${leadMeasureGRes.status}`);
+          throw new Error(`HTTP error! status: ${leadMeasureGRes.status}`);
         setDataLeadMeasureG(await leadMeasureGRes.json());
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -290,7 +290,7 @@ const Dashboard = () => {
       {/* Header */}
       <header className="bg-white dark:bg-slate-700 shadow-lg rounded-lg p-4 mb-6 flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center gap-4">
-          <Image src="/wig/logo.png" alt="Logo" width={80} height={80} />
+          <Image src="/logo.png" alt="Logo" width={80} height={80} />
           <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
             Dashboard Workshop 2024
           </h1>
