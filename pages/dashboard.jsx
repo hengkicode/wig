@@ -1,33 +1,43 @@
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
+// Import icon dari react-icons
+import { FaDollarSign, FaArrowUp, FaBalanceScale, FaArrowDown } from "react-icons/fa";
 
-// Impor ApexCharts secara dinamis
-const ApexChart = dynamic(
-  () => import("react-apexcharts").then((mod) => mod.default),
-  { ssr: false }
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+  ChartDataLabels
 );
 
-// Komponen grafik Division Progress Horizontal dengan tinggi dinamis dan data label di dalam bar
-const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick }) => {
-  // Hitung tinggi kontainer minimal: 40px per divisi (minimal 400px)
+// Komponen grafik Division Progress Horizontal
+const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick, isDarkMode }) => {
   const containerHeight = Math.max(400, dataProgres.length * 40);
   const labels = dataProgres.map((d) => d.name);
   const progressData = dataProgres.map((d) => d.progress || 0);
+  const textColor = isDarkMode ? "#fff" : "#000";
 
   const chartData = {
     labels,
@@ -43,7 +53,7 @@ const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick }) => {
   };
 
   const options = {
-    indexAxis: "y", // Horizontal bar chart
+    indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
     scales: {
@@ -52,15 +62,24 @@ const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick }) => {
         max: 100,
         display: false,
       },
+      y: {
+        ticks: {
+          color: textColor,
+        },
+      },
     },
     plugins: {
       datalabels: {
         anchor: "end",
         align: "end",
+        offset: 0,
         formatter: (value) => value + "%",
-        color: "#000",
-        font: {
-          weight: "bold",
+        color: textColor,
+        font: { weight: "bold" },
+      },
+      legend: {
+        labels: {
+          color: textColor,
         },
       },
     },
@@ -74,13 +93,14 @@ const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick }) => {
 
   return (
     <div
-      className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg"
+      className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg ${
+        dataProgres.length * 40 > 400 ? "overflow-y-auto" : ""
+      }`}
       style={{ height: containerHeight }}
     >
-      <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-        Division Progress (Horizontal)
+      <h2 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">
+        Division Progress
       </h2>
-      {/* Sisakan ruang sekitar 50px untuk judul dan padding */}
       <Bar data={chartData} options={options} height={containerHeight - 50} />
     </div>
   );
@@ -95,6 +115,8 @@ const Dashboard = () => {
   const [dataLeadMeasureInput, setDataLeadMeasureInput] = useState([]);
   const [dataWigStatus, setDataWigStatus] = useState({});
   const [dataLeadMeasureG, setDataLeadMeasureG] = useState({});
+
+  const textColor = isDarkMode ? "#fff" : "#000";
 
   // Format tanggal realtime (DD/MM/YYYY)
   const currentDate = new Date();
@@ -158,62 +180,114 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // Konfigurasi ApexCharts untuk Revenue Growth
-  const revenueOptions = {
-    chart: {
-      type: "area",
-      height: 350,
-      animations: {
-        enabled: true,
-        easing: "easeinout",
-        speed: 800,
-        animateGradually: { enabled: true, delay: 150 },
-        dynamicAnimation: { enabled: true, speed: 350 },
-      },
-      toolbar: { show: true },
-      zoom: { enabled: false },
-    },
-    dataLabels: { enabled: false },
-    stroke: { curve: "smooth", width: 2 },
-    xaxis: {
-      categories: dataRevenueGrowth.months || [],
-      labels: { style: { fontSize: "12px", fontFamily: "Arial, sans-serif" } },
-    },
-    yaxis: { labels: { style: { fontSize: "12px", fontFamily: "Arial, sans-serif" } } },
-    tooltip: { theme: "dark", x: { format: "MMM" } },
-    fill: {
-      type: "gradient",
-      gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 90, 100] },
-    },
-    legend: { position: "top", horizontalAlign: "center", labels: { useSeriesColors: true } },
-    annotations: {
-      yaxis: [
-        {
-          y: 0,
-          borderColor: "#FF0000",
-          label: {
-            borderColor: "#FF0000",
-            style: { color: "#fff", background: "#FF0000" },
-            text: "0",
-          },
+  // Konfigurasi area chart untuk Revenue Growth dengan gradient fill dan data label di top
+  const areaChartData = {
+    labels: dataRevenueGrowth.months || [],
+    datasets: [
+      {
+        label: "2024 Revenue Growth (%)",
+        data: dataRevenueGrowth.growth2024 || [],
+        fill: true,
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) {
+            return "rgba(75,192,192,0.2)";
+          }
+          const gradient = ctx.createLinearGradient(
+            0,
+            chartArea.top,
+            0,
+            chartArea.bottom
+          );
+          gradient.addColorStop(0, "rgba(75,192,192,0.4)");
+          gradient.addColorStop(1, "rgba(75,192,192,0)");
+          return gradient;
         },
-      ],
-    },
-    title: { text: "", align: "center" },
+        borderColor: "rgba(75,192,192,1)",
+        tension: 0.4,
+        borderWidth: 2,
+      },
+      {
+        label: "2025 Revenue Growth (%)",
+        data: dataRevenueGrowth.growth2025 || [],
+        fill: true,
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) {
+            return "rgba(255,165,0,0.2)";
+          }
+          const gradient = ctx.createLinearGradient(
+            0,
+            chartArea.top,
+            0,
+            chartArea.bottom
+          );
+          gradient.addColorStop(0, "rgba(255,165,0,0.4)");
+          gradient.addColorStop(1, "rgba(255,165,0,0)");
+          return gradient;
+        },
+        borderColor: "rgba(255,165,0,1)",
+        tension: 0.4,
+        borderWidth: 2,
+      },
+    ],
   };
 
-  const revenueSeries = [
-    {
-      name: "2024 Revenue Growth (%)",
-      data: dataRevenueGrowth.growth2024 || [],
+  const areaChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+        labels: { color: textColor },
+      },
+      tooltip: {
+        mode: "index",
+        intersect: false,
+      },
+      title: {
+        display: false,
+      },
+      datalabels: {
+        anchor: "end",
+        align: "end",
+        formatter: (value) => value + "%",
+        color: textColor,
+        font: { weight: "bold" },
+      },
     },
-    {
-      name: "2025 Revenue Growth (%)",
-      data: dataRevenueGrowth.growth2025 || [],
+    interaction: {
+      mode: "index",
+      intersect: false,
     },
-  ];
+    scales: {
+      x: {
+        display: true, // Jika x-axis perlu tetap muncul, sesuaikan jika ingin disembunyikan
+        ticks: {
+          font: {
+            size: 12,
+            family: "Arial, sans-serif",
+          },
+          color: textColor,
+        },
+        grid: { display: false },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          font: {
+            size: 12,
+            family: "Arial, sans-serif",
+          },
+          color: textColor,
+        },
+      },
+    },
+  };
 
-  // Konfigurasi chart Lead Measure (versi kecil)
+  // Konfigurasi chart Lead Measure (versi kecil) dengan data label di tengah
   const leadMeasureChartData = {
     labels: ["Lead Measure"],
     datasets: [
@@ -244,12 +318,36 @@ const Dashboard = () => {
   const leadMeasureChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: "top" }, title: { display: true, text: "Lead Measure" } },
+    plugins: {
+      legend: { 
+        position: "top",
+        labels: { color: textColor }
+      },
+      title: { display: true, text: "Lead Measure", color: textColor },
+      datalabels: {
+        anchor: "center",
+        align: "center",
+        offset: 0,
+        formatter: (value) => value,
+        color: textColor,
+        font: { weight: "bold" },
+      },
+    },
     indexAxis: "y",
-    scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } },
+    scales: {
+      x: { 
+        stacked: true, 
+        beginAtZero: true,
+        ticks: { color: textColor }
+      },
+      y: { 
+        stacked: true,
+        ticks: { color: textColor }
+      },
+    },
   };
 
-  // Konfigurasi chart WIG Status (versi kecil)
+  // Konfigurasi chart WIG Status (versi kecil) dengan data label di tengah
   const wigStatusChartData = {
     labels: ["WIG Status"],
     datasets: [
@@ -280,9 +378,33 @@ const Dashboard = () => {
   const wigStatusChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: "top" }, title: { display: true, text: "WIG Status" } },
+    plugins: {
+      legend: { 
+        position: "top",
+        labels: { color: textColor }
+      },
+      title: { display: true, text: "WIG Status", color: textColor },
+      datalabels: {
+        anchor: "center",
+        align: "center",
+        offset: 0,
+        formatter: (value) => value,
+        color: textColor,
+        font: { weight: "bold" },
+      },
+    },
     indexAxis: "y",
-    scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } },
+    scales: {
+      x: { 
+        stacked: true, 
+        beginAtZero: true,
+        ticks: { color: textColor }
+      },
+      y: { 
+        stacked: true,
+        ticks: { color: textColor }
+      },
+    },
   };
 
   return (
@@ -290,7 +412,7 @@ const Dashboard = () => {
       {/* Header */}
       <header className="bg-white dark:bg-slate-700 shadow-lg rounded-lg p-4 mb-6 flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="Logo" width={80} height={80} />
+          <Image src="/wig/logo.png" alt="logo" width={80} height={80} />
           <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
             Dashboard Workshop 2024
           </h1>
@@ -310,71 +432,81 @@ const Dashboard = () => {
         {/* Sidebar */}
         <aside className="w-full lg:w-1/4 bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
           <div className="space-y-4">
-            {/* Metric Cards */}
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow">
-              <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Revenue Growth</h2>
-              <p className="text-2xl font-bold text-orange-500">{dataGrowth.globalGrowth || 0}%</p>
+            {/* Revenue Growth Card */}
+            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
+              <FaDollarSign className="text-orange-500 mr-2" size={24} />
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Revenue Growth</h2>
+                <p className="text-2xl font-bold text-orange-500">{dataGrowth.globalGrowth || 0}%</p>
+              </div>
             </div>
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow">
-              <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Highest Monthly Revenue</h2>
-              <p className="text-2xl font-bold text-green-500">{dataGrowth.revenueMetrics?.highest ?? "N/A"}%</p>
+            {/* Highest Monthly Revenue Card */}
+            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
+              <FaArrowUp className="text-green-500 mr-2" size={24} />
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Highest Monthly Revenue</h2>
+                <p className="text-2xl font-bold text-green-500">{dataGrowth.revenueMetrics?.highest ?? "N/A"}%</p>
+              </div>
             </div>
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow">
-              <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Average Monthly Revenue</h2>
-              <p className="text-2xl font-bold text-blue-500">{dataGrowth.revenueMetrics?.average ?? "N/A"}%</p>
+            {/* Average Monthly Revenue Card */}
+            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
+              <FaBalanceScale className="text-blue-500 mr-2" size={24} />
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Average Monthly Revenue</h2>
+                <p className="text-2xl font-bold text-blue-500">{dataGrowth.revenueMetrics?.average ?? "N/A"}%</p>
+              </div>
             </div>
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow">
-              <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Lowest Monthly Revenue</h2>
-              <p className="text-2xl font-bold text-red-500">{dataGrowth.revenueMetrics?.lowest ?? "N/A"}%</p>
+            {/* Lowest Monthly Revenue Card */}
+            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
+              <FaArrowDown className="text-red-500 mr-2" size={24} />
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Lowest Monthly Revenue</h2>
+                <p className="text-2xl font-bold text-red-500">{dataGrowth.revenueMetrics?.lowest ?? "N/A"}%</p>
+              </div>
             </div>
           </div>
 
-          {/* Small Charts */}
           <div className="mt-6">
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Lead Measure</h3>
+            <h3 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">Lead Measure</h3>
+            <p className="text-xl mt-2 dark:text-white">Progress: {dataLeadMeasureG.progress || 0}%</p>
             <div className="min-h-[150px] pb-2">
               <Bar data={leadMeasureChartData} options={leadMeasureChartOptions} />
             </div>
-            <p className="text-sm mt-2">Progress: {dataLeadMeasureG.progress || 0}%</p>
+            
           </div>
           <div className="mt-6">
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">WIG Status</h3>
+            <h3 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">WIG Status</h3>
+            <p className="text-xl mt-2 dark:text-white">Progress: {dataWigStatus.progress || 0}%</p>
             <div className="min-h-[150px] pb-2">
               <Bar data={wigStatusChartData} options={wigStatusChartOptions} />
             </div>
-            <p className="text-sm mt-2">Progress: {dataWigStatus.progress || 0}%</p>
+            
           </div>
         </aside>
 
         {/* Main Content */}
         <main className="w-full lg:w-3/4 space-y-6">
           <div className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+            <h2 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">
               Monthly Growth 2024 vs 2025
             </h2>
             <div className="min-h-[300px]">
               {Object.keys(dataRevenueGrowth).length > 0 ? (
-                <ApexChart
-                  options={revenueOptions}
-                  series={revenueSeries}
-                  type="area"
-                  height={350}
-                />
+                <Line data={areaChartData} options={areaChartOptions} height={350} />
               ) : (
                 <p>Loading chart...</p>
               )}
             </div>
           </div>
 
-          {/* Grafik Division Progress Horizontal dengan klik untuk popup */}
           <DivisionProgressChartHorizontal
             dataProgres={dataProgres}
             onDivisionClick={setSelectedDivision}
+            isDarkMode={isDarkMode}
           />
         </main>
       </div>
 
-      {/* Recent Updates Full Width */}
       <div className="mt-6">
         <div className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
           <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
@@ -384,21 +516,21 @@ const Dashboard = () => {
             <table className="min-w-full text-sm">
               <thead className="bg-gray-100 dark:bg-slate-800">
                 <tr>
-                  <th className="px-2 py-1 text-left">Division</th>
-                  <th className="px-2 py-1 text-left">WIG</th>
-                  <th className="px-2 py-1 text-left">Lead Measure</th>
-                  <th className="px-2 py-1 text-center">Input Progress</th>
-                  <th className="px-2 py-1 text-center">Timestamp</th>
+                  <th className="px-2 py-1 text-left dark:text-white">Division</th>
+                  <th className="px-2 py-1 text-left dark:text-white">WIG</th>
+                  <th className="px-2 py-1 text-left dark:text-white">Lead Measure</th>
+                  <th className="px-2 py-1 text-center dark:text-white">Input Progress</th>
+                  <th className="px-2 py-1 text-center dark:text-white">Timestamp</th>
                 </tr>
               </thead>
               <tbody>
                 {dataLeadMeasureInput.slice(0, 10).map((item, idx) => (
                   <tr key={idx} className="border-t dark:border-slate-600">
-                    <td className="px-2 py-1">{item.division}</td>
-                    <td className="px-2 py-1">{item.wig}</td>
-                    <td className="px-2 py-1">{item.leadMeasure}</td>
-                    <td className="px-2 py-1 text-center">{item.input}</td>
-                    <td className="px-2 py-1 text-center">{item.timestamp}</td>
+                    <td className="px-2 py-1 dark:text-white">{item.division}</td>
+                    <td className="px-2 py-1 dark:text-white">{item.wig}</td>
+                    <td className="px-2 py-1 dark:text-white">{item.leadMeasure}</td>
+                    <td className="px-2 py-1 text-center dark:text-white">{item.input}</td>
+                    <td className="px-2 py-1 text-center dark:text-white">{item.timestamp}</td>
                   </tr>
                 ))}
               </tbody>
@@ -407,7 +539,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Popup Detail Division */}
       <AnimatePresence>
         {selectedDivision && (
           <motion.div
