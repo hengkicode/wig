@@ -17,7 +17,7 @@ import {
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
 // Import icon dari react-icons
-import { FaDollarSign, FaArrowUp, FaBalanceScale, FaArrowDown } from "react-icons/fa";
+import { FaDollarSign, FaArrowUp, FaBalanceScale, FaArrowDown, FaSun, FaMoon } from "react-icons/fa";
 
 ChartJS.register(
   CategoryScale,
@@ -115,6 +115,9 @@ const Dashboard = () => {
   const [dataLeadMeasureInput, setDataLeadMeasureInput] = useState([]);
   const [dataWigStatus, setDataWigStatus] = useState({});
   const [dataLeadMeasureG, setDataLeadMeasureG] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDivisionFilter, setSelectedDivisionFilter] = useState('All');
+  const itemsPerPage = 10;
 
   const textColor = isDarkMode ? "#fff" : "#000";
 
@@ -179,6 +182,23 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
+
+  // derive division options
+  const divisionOptions = ['All', ...new Set(dataLeadMeasureInput.map(item => item.division))];
+
+  // Filter data berdasarkan division saja
+  const filteredData = dataLeadMeasureInput.filter(item =>
+    selectedDivisionFilter === 'All' || item.division === selectedDivisionFilter
+  );
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage);
+  };
 
   // Konfigurasi area chart untuk Revenue Growth dengan gradient fill dan data label di top
   const areaChartData = {
@@ -421,9 +441,9 @@ const Dashboard = () => {
           <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            className="p-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full shadow-md transition transform hover:-translate-y-0.5"
           >
-            {isDarkMode ? "Light Mode" : "Dark Mode"}
+            {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
           </button>
         </div>
       </header>
@@ -509,9 +529,18 @@ const Dashboard = () => {
 
       <div className="mt-6">
         <div className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
-          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-            Recent Updates
-          </h2>
+          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Recent Updates</h2>
+          <div className="mb-2">
+            <select
+              value={selectedDivisionFilter}
+              onChange={e => { setSelectedDivisionFilter(e.target.value); setCurrentPage(1); }}
+              className="w-full px-3 py-1 border rounded focus:outline-none focus:ring bg-white"
+            >
+              {divisionOptions.map(div => (
+                <option key={div} value={div}>{div}</option>
+              ))}
+            </select>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-100 dark:bg-slate-800">
@@ -520,22 +549,39 @@ const Dashboard = () => {
                   <th className="px-2 py-1 text-left dark:text-white">WIG</th>
                   <th className="px-2 py-1 text-left dark:text-white">Lead Measure</th>
                   <th className="px-2 py-1 text-center dark:text-white">Input Progress</th>
+                  <th className="px-2 py-1 text-center dark:text-white">Tanggal Pelaksanaan</th>
                   <th className="px-2 py-1 text-center dark:text-white">Timestamp</th>
                 </tr>
               </thead>
               <tbody>
-                {dataLeadMeasureInput.slice(0, 10).map((item, idx) => (
+                {currentItems.map((item, idx) => (
                   <tr key={idx} className="border-t dark:border-slate-600">
                     <td className="px-2 py-1 dark:text-white">{item.division}</td>
                     <td className="px-2 py-1 dark:text-white">{item.wig}</td>
                     <td className="px-2 py-1 dark:text-white">{item.leadMeasure}</td>
                     <td className="px-2 py-1 text-center dark:text-white">{item.input}</td>
+                    <td className="px-2 py-1 text-center dark:text-white">{item.tanggal_pelaksanaan}</td>
                     <td className="px-2 py-1 text-center dark:text-white">{item.timestamp}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-4 space-x-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-300 dark:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              >Previous</button>
+              <span className="dark:text-white">Page {currentPage} of {totalPages}</span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-300 dark:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              >Next</button>
+            </div>
+          )}
         </div>
       </div>
 

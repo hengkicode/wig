@@ -8,8 +8,8 @@ const Leadmeasure = () => {
   const [id_devisi, setid_devisi] = useState(null);
   const [leadmeasure, setLeadMeasure] = useState([]);
   const [inputValues, setInputValues] = useState({});
+  const [dateValues, setDateValues] = useState({});
 
-  // Fetch data from API
   useEffect(() => {
     const storedDivisi = localStorage.getItem("nama_divisi");
     if (storedDivisi) {
@@ -80,20 +80,34 @@ const Leadmeasure = () => {
       const data = await response.json();
 
       const initialInputValues = {};
-      data.data.forEach((item) => {
+      const initialDateValues = {};
+      (data.data || []).forEach((item) => {
         initialInputValues[item.id_leadmeasure] = item.actual_input || "";
+        initialDateValues[item.id_leadmeasure] = item.tanggal_pelaksanaan || "";
       });
 
       setLeadMeasure(data.data || []);
       setInputValues(initialInputValues);
+      setDateValues(initialDateValues);
     } catch (error) {
       console.error("Error fetching lead measure:", error);
+      setLeadMeasure([]);
+      setInputValues({});
+      setDateValues({});
     }
   };
 
   const updateLeadmeasure = async (id_leadmeasure) => {
     if (!selectedWig) {
       console.error("Selected WIG is not set.");
+      return;
+    }
+
+    const tanggalPelaksanaan = dateValues[id_leadmeasure];
+    const actualInput = inputValues[id_leadmeasure];
+
+    if (!actualInput || !tanggalPelaksanaan) {
+      alert("Actual dan Tanggal Pelaksanaan harus diisi.");
       return;
     }
 
@@ -108,7 +122,8 @@ const Leadmeasure = () => {
           body: JSON.stringify({
             id_wig: selectedWig.value,
             id_leadmeasure: id_leadmeasure,
-            actual_input: inputValues[id_leadmeasure],
+            actual_input: actualInput,
+            tanggal_pelaksanaan: tanggalPelaksanaan,
           }),
         }
       );
@@ -161,6 +176,7 @@ const Leadmeasure = () => {
       sisa_target: 0,
       rill_target: 0,
       actual_input: 0,
+      tanggal_pelaksanaan: "",
       isNew: true,
     };
 
@@ -180,8 +196,10 @@ const Leadmeasure = () => {
     try {
       const newRows = leadmeasure.filter((item) => item.isNew);
       for (const row of newRows) {
-        if (!row.leadmeasure || !row.rill_target) {
-          alert("Lead Measure dan Rill Target tidak boleh kosong.");
+        if (!row.leadmeasure || !row.rill_target || !row.tanggal_pelaksanaan) {
+          alert(
+            "Lead Measure, Rill Target, dan Tanggal Pelaksanaan tidak boleh kosong."
+          );
           return;
         }
 
@@ -198,6 +216,7 @@ const Leadmeasure = () => {
               leadmeasure: row.leadmeasure,
               sisa_target: row.sisa_target,
               rill_target: row.rill_target,
+              tanggal_pelaksanaan: row.tanggal_pelaksanaan,
             }),
           }
         );
@@ -217,22 +236,29 @@ const Leadmeasure = () => {
     }));
   };
 
-  const handleRillTargetChange = (index, value) => {
+  const handleDateChange = (id_leadmeasure, value) => {
+    setDateValues((prevValues) => ({
+      ...prevValues,
+      [id_leadmeasure]: value,
+    }));
+  };
+
+  const handleNewRowChange = (index, field, value) => {
     const updatedLeadmeasure = [...leadmeasure];
-    updatedLeadmeasure[index].rill_target = value;
-    updatedLeadmeasure[index].sisa_target = value;
+    updatedLeadmeasure[index][field] = value;
+    if (field === "rill_target") {
+      updatedLeadmeasure[index].sisa_target = value;
+    }
     setLeadMeasure(updatedLeadmeasure);
   };
 
-  // Ubah fungsi back untuk navigasi ke komponen tindakan.jsx
   const tindakan = () => {
-    navigate("/tindakan"); // Pastikan route "/tindakan" telah dikonfigurasi untuk memuat tindakan.jsx
+    navigate("/tindakan");
   };
-
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-4 md:p-8 rounded shadow-md w-full lg:w-1/2">
+      <div className="bg-white p-4 md:p-8 rounded shadow-md w-full lg:w-3/4">
         <div className="flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8">
           <div>
             <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800 underline">
@@ -276,13 +302,14 @@ const Leadmeasure = () => {
                   <th className="px-2 md:px-4 py-2">Lead Measure</th>
                   <th className="px-2 md:px-4 py-2">Gap</th>
                   <th className="px-2 md:px-4 py-2">Target</th>
+                  <th className="px-2 md:px-4 py-2">Tanggal Pelaksanaan</th>
                   <th className="px-2 md:px-4 py-2">Actual</th>
                   <th className="px-2 md:px-4 py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {leadmeasure.map((item, index) => (
-                  <tr key={index}>
+                  <tr key={item.id_leadmeasure || index}>
                     <td className="border px-2 md:px-4 py-2">{index + 1}</td>
                     <td className="border px-2 md:px-4 py-2">
                       {item.isNew ? (
@@ -290,12 +317,9 @@ const Leadmeasure = () => {
                           type="text"
                           className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           value={item.leadmeasure}
-                          onChange={(e) => {
-                            const updatedLeadmeasure = [...leadmeasure];
-                            updatedLeadmeasure[index].leadmeasure =
-                              e.target.value;
-                            setLeadMeasure(updatedLeadmeasure);
-                          }}
+                          onChange={(e) =>
+                            handleNewRowChange(index, "leadmeasure", e.target.value)
+                          }
                         />
                       ) : (
                         item.leadmeasure
@@ -305,7 +329,7 @@ const Leadmeasure = () => {
                       {item.isNew ? (
                         <input
                           type="number"
-                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200"
                           value={item.sisa_target}
                           readOnly
                         />
@@ -320,7 +344,7 @@ const Leadmeasure = () => {
                           className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           value={item.rill_target}
                           onChange={(e) =>
-                            handleRillTargetChange(index, e.target.value)
+                            handleNewRowChange(index, "rill_target", e.target.value)
                           }
                         />
                       ) : (
@@ -328,7 +352,36 @@ const Leadmeasure = () => {
                       )}
                     </td>
                     <td className="border px-2 md:px-4 py-2">
-                      {!item.isNew && (
+                      {item.isNew ? (
+                        <input
+                          type="date"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={item.tanggal_pelaksanaan || ""}
+                          onChange={(e) =>
+                            handleNewRowChange(
+                              index,
+                              "tanggal_pelaksanaan",
+                              e.target.value
+                            )
+                          }
+                          required
+                        />
+                      ) : (
+                        <input
+                          type="date"
+                          className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          value={dateValues[item.id_leadmeasure] || ""}
+                          onChange={(e) =>
+                            handleDateChange(item.id_leadmeasure, e.target.value)
+                          }
+                          required
+                        />
+                      )}
+                    </td>
+                    <td className="border px-2 md:px-4 py-2">
+                      {item.isNew ? (
+                        <span>-</span>
+                      ) : (
                         <input
                           type="number"
                           className="shadow appearance-none border rounded w-full py-1 md:py-2 px-2 md:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -336,49 +389,25 @@ const Leadmeasure = () => {
                           onChange={(e) =>
                             handleInputChange(item.id_leadmeasure, e.target.value)
                           }
+                          required
                         />
                       )}
                     </td>
                     <td className="border px-2 md:px-4 py-2">
                       {item.isNew ? (
-                        <>
-                          <button
-                            onClick={saveBarisBaru}
-                            className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
-                          >
-                            Save
-                          </button>
-                          {/* <button
-                            onClick={() => {
-                              const updatedLeadmeasure = leadmeasure.filter(
-                                (row) =>
-                                  row.id_leadmeasure !== item.id_leadmeasure
-                              );
-                              setLeadMeasure(updatedLeadmeasure);
-                              const updatedInputValues = { ...inputValues };
-                              delete updatedInputValues[item.id_leadmeasure];
-                              setInputValues(updatedInputValues);
-                            }}
-                            className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                          >
-                            Hapus
-                          </button> */}
-                        </>
+                        <button
+                          onClick={saveBarisBaru}
+                          className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                        >
+                          Save
+                        </button>
                       ) : (
-                        <>
-                          <button
-                            onClick={() => updateLeadmeasure(item.id_leadmeasure)}
-                            className="bg-green-500 text-xs hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
-                          >
-                            Update
-                          </button>
-                          {/* <button
-                            onClick={() => hapusLeadmeasure(item.id_leadmeasure)}
-                            className="bg-red-500 text-xs hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                          >
-                            Hapus
-                          </button> */}
-                        </>
+                        <button
+                          onClick={() => updateLeadmeasure(item.id_leadmeasure)}
+                          className="bg-green-500 text-xs hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
+                        >
+                          Update
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -387,23 +416,6 @@ const Leadmeasure = () => {
             </table>
           </div>
         </div>
-
-        {/* <div className="flex flex-col md:flex-row items-center justify-between pt-4">
-          <button
-            className="cursor-pointer font-xs mx-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 md:mb-0"
-            type="button"
-            onClick={tindakan}
-          >
-            Back
-          </button>
-          <button
-            className="font-xs mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={tambahBaris}
-          >
-            Tambah Baris
-          </button>
-        </div> */}
       </div>
     </div>
   );
