@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Tindakan from "./tindakan";
 import Dashboard from "./dashboard";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -11,6 +11,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isGM, setIsGM] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Cek apakah sudah login sebelumnya
@@ -20,15 +21,13 @@ export default function Home() {
         const parsedData = JSON.parse(storedData);
         if (parsedData?.value) {
           setIsLoggedIn(true);
-          if (parsedData.value === "gm") {
-            setIsGM(true);
-          }
+          router.replace("/dashboard");
         }
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
     }
-  }, []);
+  }, [router]);
 
   const saveToLocalStorage = (key, value) => {
     const now = new Date();
@@ -56,9 +55,8 @@ export default function Home() {
       setIsLoggedIn(true);
       setError("");
 
-      if (data.username === "gm") {
-        setIsGM(true);
-      }
+      // Semua user langsung ke dashboard
+      router.push("/dashboard");
 
       console.log(response.data);
     } catch (err) {
@@ -69,12 +67,16 @@ export default function Home() {
         console.error("Login error:", err);
         setError("Terjadi kesalahan. Silakan coba lagi nanti.");
       }
-      setIsLoggedIn(false);
     }
   };
 
   if (isLoggedIn) {
-    return isGM ? <Dashboard /> : <Tindakan />;
+    // Tampilkan pesan loading saat redirect
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-4">
+        <div className="text-lg font-semibold">Redirecting...</div>
+      </div>
+    );
   }
 
   return (

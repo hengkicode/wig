@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { FaSun, FaMoon } from "react-icons/fa";
 
 const Leadmeasure = () => {
   const [wigOptions, setWigOptions] = useState([]);
@@ -9,6 +12,28 @@ const Leadmeasure = () => {
   const [leadmeasure, setLeadMeasure] = useState([]);
   const [inputValues, setInputValues] = useState({});
   const [dateValues, setDateValues] = useState({});
+  const router = useRouter();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Fungsi tombol navigasi
+  const handleLeadMeasure = () => router.push("/leadmeasure");
+  const handleDashboard = () => router.push("/dashboard");
+  const handleLogout = () => {
+    // Bersihkan localStorage jika perlu
+    localStorage.clear();
+    router.push("/");
+  };
+
+  // Format tanggal realtime (DD/MM/YYYY)
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getDate().toString().padStart(2, "0")}/${(currentDate.getMonth() + 1).toString().padStart(2, "0")}/${currentDate.getFullYear()}`;
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("username");
+    if (!storedData) {
+      router.replace("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     const storedDivisi = localStorage.getItem("nama_divisi");
@@ -257,19 +282,41 @@ const Leadmeasure = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-4 md:p-8 rounded shadow-md w-full lg:w-3/4">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800 underline">
-              Input Lead Measure
-            </h2>
+    <div className={`${isDarkMode ? "dark" : ""} min-h-screen bg-gradient-to-r from-[#F14A00] to-[#FF8C00] dark:bg-slate-900 p-4 sm:p-6 transition-colors`}>
+      {/* Header profesional */}
+      <header className="bg-white dark:bg-slate-700 shadow-lg rounded-lg p-4 mb-6 w-full flex flex-col sm:flex-row justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Image src="/wig/logo.png" alt="logo" width={80} height={80} />
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
+            Lead Measure Input
+          </h1>
+        </div>
+        <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row items-center mt-4 sm:mt-0">
+          <div className="flex gap-2 mb-2 sm:mb-0">
+            <button onClick={handleLeadMeasure} className="px-5 py-2 rounded-lg bg-[#377dff] text-white font-semibold shadow hover:bg-blue-700 transition">Lead Measure</button>
+            <button onClick={handleDashboard} className="px-5 py-2 rounded-lg bg-[#22c55e] text-white font-semibold shadow hover:bg-green-700 transition">Dashboard</button>
+            <button onClick={handleLogout} className="px-5 py-2 rounded-lg bg-[#ef4444] text-white font-semibold shadow hover:bg-red-700 transition">Logout</button>
           </div>
-          <div>
-            {divisi && (
-              <p className="text-gray-700 mb-4 font-bold">Divisi: {divisi}</p>
-            )}
+          <div className="flex items-center gap-2">
+            <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full shadow-md transition transform hover:-translate-y-0.5"
+            >
+              {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+            </button>
           </div>
+        </div>
+      </header>
+
+      <div className="bg-white p-4 md:p-8 rounded shadow-md w-full">
+        <div className="flex flex-row items-center justify-between mb-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 underline">
+            Input Lead Measure
+          </h2>
+          {divisi && (
+            <p className="text-gray-700 font-bold ml-4">Divisi: {divisi}</p>
+          )}
         </div>
 
         <div className="mb-4">

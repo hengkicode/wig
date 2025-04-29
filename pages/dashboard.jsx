@@ -15,6 +15,7 @@ import {
   Filler,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { useRouter } from "next/router";
 
 // Import icon dari react-icons
 import { FaDollarSign, FaArrowUp, FaBalanceScale, FaArrowDown, FaSun, FaMoon } from "react-icons/fa";
@@ -120,6 +121,24 @@ const Dashboard = () => {
   const itemsPerPage = 10;
 
   const textColor = isDarkMode ? "#fff" : "#000";
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("username");
+    if (!storedData) {
+      router.replace("/");
+    }
+  }, [router]);
+
+  // Fungsi tombol
+  const handleLeadMeasure = () => router.push("/leadmeasure");
+  const handleDashboard = () => router.push("/dashboard");
+  const handleLogout = () => {
+    // Jika ada token di localStorage/sessionStorage, hapus di sini
+    // localStorage.removeItem('token');
+    router.push("/");
+  };
 
   // Format tanggal realtime (DD/MM/YYYY)
   const currentDate = new Date();
@@ -437,14 +456,21 @@ const Dashboard = () => {
             Dashboard Workshop 2024
           </h1>
         </div>
-        <div className="flex items-center gap-4 mt-4 sm:mt-0">
-          <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full shadow-md transition transform hover:-translate-y-0.5"
-          >
-            {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-          </button>
+        <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row items-center mt-4 sm:mt-0">
+          <div className="flex gap-2 mb-2 sm:mb-0">
+            <button onClick={handleLeadMeasure} className="px-5 py-2 rounded-lg bg-[#377dff] text-white font-semibold shadow hover:bg-blue-700 transition">Lead Measure</button>
+            <button onClick={handleDashboard} className="px-5 py-2 rounded-lg bg-[#22c55e] text-white font-semibold shadow hover:bg-green-700 transition">Dashboard</button>
+            <button onClick={handleLogout} className="px-5 py-2 rounded-lg bg-[#ef4444] text-white font-semibold shadow hover:bg-red-700 transition">Logout</button>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full shadow-md transition transform hover:-translate-y-0.5"
+            >
+              {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+            </button>
+          </div>
         </div>
       </header>
 
