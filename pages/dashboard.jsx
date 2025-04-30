@@ -13,9 +13,13 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ArcElement,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useRouter } from "next/router";
+import CardMultiRingChart from "../components/CardMultiRingChart";
+import CardStat from "../components/CardStat";
+import CalendarWidget from "../components/CalendarWidget";
 
 // Import icon dari react-icons
 import { FaDollarSign, FaArrowUp, FaBalanceScale, FaArrowDown, FaSun, FaMoon } from "react-icons/fa";
@@ -30,15 +34,28 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler,
+  ArcElement,
   ChartDataLabels
 );
 
+// Tambahkan palet warna tema utama
+const THEME = {
+  primary: "#377dff",
+  secondary: "#23262F",
+  accent: "#fbbf24",
+  bgLight: "#f1efec",
+  bgDark: "#23262F",
+  cardLight: "#fff",
+  cardDark: "#23262F",
+  textLight: "#23262F",
+  textDark: "#fff",
+};
+
 // Komponen grafik Division Progress Horizontal
 const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick, isDarkMode }) => {
-  const containerHeight = Math.max(400, dataProgres.length * 40);
   const labels = dataProgres.map((d) => d.name);
   const progressData = dataProgres.map((d) => d.progress || 0);
-  const textColor = isDarkMode ? "#fff" : "#000";
+  const textColor = isDarkMode ? THEME.textDark : THEME.textLight;
 
   const chartData = {
     labels,
@@ -46,9 +63,17 @@ const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick, isDarkM
       {
         label: "Progress (%)",
         data: progressData,
-        backgroundColor: "rgba(75, 192, 192, 0.4)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
+        backgroundColor: (context) => {
+          const { ctx, chartArea } = context.chart;
+          if (!chartArea) return "#2563eb";
+          const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+          gradient.addColorStop(0, "#2563eb");
+          gradient.addColorStop(1, "#60a5fa");
+          return gradient;
+        },
+        borderRadius: 12,
+        borderSkipped: false,
+        borderWidth: 0,
       },
     ],
   };
@@ -93,16 +118,11 @@ const DivisionProgressChartHorizontal = ({ dataProgres, onDivisionClick, isDarkM
   };
 
   return (
-    <div
-      className={`bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg ${
-        dataProgres.length * 40 > 400 ? "overflow-y-auto" : ""
-      }`}
-      style={{ height: containerHeight }}
-    >
-      <h2 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">
-        Division Progress
-      </h2>
-      <Bar data={chartData} options={options} height={containerHeight - 50} />
+    <div className="flex flex-col h-full">
+      <h2 className="text-xl font-bold text-[#23262F] dark:text-white mb-2">Division Progress</h2>
+      <div className="flex-1 flex">
+        <Bar data={chartData} options={options} className="w-full h-full" />
+      </div>
     </div>
   );
 };
@@ -120,7 +140,7 @@ const Dashboard = () => {
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState('All');
   const itemsPerPage = 10;
 
-  const textColor = isDarkMode ? "#fff" : "#000";
+  const textColor = isDarkMode ? THEME.textDark : THEME.textLight;
 
   const router = useRouter();
 
@@ -326,141 +346,21 @@ const Dashboard = () => {
     },
   };
 
-  // Konfigurasi chart Lead Measure (versi kecil) dengan data label di tengah
-  const leadMeasureChartData = {
-    labels: ["Lead Measure"],
-    datasets: [
-      {
-        label: "Not Started",
-        data: [dataLeadMeasureG.notStarted],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "In Progress",
-        data: [dataLeadMeasureG.inProgress],
-        backgroundColor: "rgba(255, 206, 86, 0.2)",
-        borderColor: "rgba(255, 206, 86, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "Completed",
-        data: [dataLeadMeasureG.completed],
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const leadMeasureChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { 
-        position: "top",
-        labels: { color: textColor }
-      },
-      title: { display: true, text: "Lead Measure", color: textColor },
-      datalabels: {
-        anchor: "center",
-        align: "center",
-        offset: 0,
-        formatter: (value) => value,
-        color: textColor,
-        font: { weight: "bold" },
-      },
-    },
-    indexAxis: "y",
-    scales: {
-      x: { 
-        stacked: true, 
-        beginAtZero: true,
-        ticks: { color: textColor }
-      },
-      y: { 
-        stacked: true,
-        ticks: { color: textColor }
-      },
-    },
-  };
-
-  // Konfigurasi chart WIG Status (versi kecil) dengan data label di tengah
-  const wigStatusChartData = {
-    labels: ["WIG Status"],
-    datasets: [
-      {
-        label: "Not Started",
-        data: [dataWigStatus.notStarted],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "In Progress",
-        data: [dataWigStatus.inProgress],
-        backgroundColor: "rgba(255, 206, 86, 0.2)",
-        borderColor: "rgba(255, 206, 86, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "Completed",
-        data: [dataWigStatus.completed],
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const wigStatusChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { 
-        position: "top",
-        labels: { color: textColor }
-      },
-      title: { display: true, text: "WIG Status", color: textColor },
-      datalabels: {
-        anchor: "center",
-        align: "center",
-        offset: 0,
-        formatter: (value) => value,
-        color: textColor,
-        font: { weight: "bold" },
-      },
-    },
-    indexAxis: "y",
-    scales: {
-      x: { 
-        stacked: true, 
-        beginAtZero: true,
-        ticks: { color: textColor }
-      },
-      y: { 
-        stacked: true,
-        ticks: { color: textColor }
-      },
-    },
-  };
-
   return (
-    <div className={`${isDarkMode ? "dark" : ""} min-h-screen bg-gradient-to-r from-[#F14A00] to-[#FF8C00] dark:bg-slate-900 p-4 sm:p-6 transition-colors`}>
+    <div className={`${isDarkMode ? "dark" : ""} min-h-screen bg-gradient-to-r from-[#F14A00] to-[#FF8C00] dark:bg-[#23262F] p-4 sm:p-6 transition-colors`}>
       {/* Header */}
-      <header className="bg-white dark:bg-slate-700 shadow-lg rounded-lg p-4 mb-6 flex flex-col sm:flex-row justify-between items-center">
+      <header className="bg-white dark:bg-[#23262F] shadow-lg rounded-lg p-4 mb-6 flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center gap-4">
           <Image src="/wig/logo.png" alt="logo" width={80} height={80} />
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
+          <h1 className="text-xl sm:text-3xl font-bold text-[#23262F] dark:text-white">
             Dashboard Workshop 2024
           </h1>
         </div>
         <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row items-center mt-4 sm:mt-0">
           <div className="flex gap-2 mb-2 sm:mb-0">
             <button onClick={handleLeadMeasure} className="px-5 py-2 rounded-lg bg-[#377dff] text-white font-semibold shadow hover:bg-blue-700 transition">Lead Measure</button>
-            <button onClick={handleDashboard} className="px-5 py-2 rounded-lg bg-[#22c55e] text-white font-semibold shadow hover:bg-green-700 transition">Dashboard</button>
-            <button onClick={handleLogout} className="px-5 py-2 rounded-lg bg-[#ef4444] text-white font-semibold shadow hover:bg-red-700 transition">Logout</button>
+            <button onClick={handleDashboard} className="px-5 py-2 rounded-lg bg-green-500 text-white font-semibold shadow hover:bg-green-700 transition">Dashboard</button>
+            <button onClick={handleLogout} className="px-5 py-2 rounded-lg bg-red-500 text-white font-semibold shadow hover:bg-red-700 transition">Logout</button>
           </div>
           <div className="flex items-center gap-2">
             <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
@@ -474,152 +374,145 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar */}
-        <aside className="w-full lg:w-1/4 bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
-          <div className="space-y-4">
-            {/* Revenue Growth Card */}
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
-              <FaDollarSign className="text-orange-500 mr-2" size={24} />
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Revenue Growth</h2>
-                <p className="text-2xl font-bold text-orange-500">{dataGrowth.globalGrowth || 0}%</p>
-              </div>
-            </div>
-            {/* Highest Monthly Revenue Card */}
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
-              <FaArrowUp className="text-green-500 mr-2" size={24} />
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Highest Monthly Revenue</h2>
-                <p className="text-2xl font-bold text-green-500">{dataGrowth.revenueMetrics?.highest ?? "N/A"}%</p>
-              </div>
-            </div>
-            {/* Average Monthly Revenue Card */}
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
-              <FaBalanceScale className="text-blue-500 mr-2" size={24} />
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Average Monthly Revenue</h2>
-                <p className="text-2xl font-bold text-blue-500">{dataGrowth.revenueMetrics?.average ?? "N/A"}%</p>
-              </div>
-            </div>
-            {/* Lowest Monthly Revenue Card */}
-            <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-lg shadow flex items-center">
-              <FaArrowDown className="text-red-500 mr-2" size={24} />
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300">Lowest Monthly Revenue</h2>
-                <p className="text-2xl font-bold text-red-500">{dataGrowth.revenueMetrics?.lowest ?? "N/A"}%</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <h3 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">Lead Measure</h3>
-            <p className="text-xl mt-2 dark:text-white">Progress: {dataLeadMeasureG.progress || 0}%</p>
-            <div className="min-h-[150px] pb-2">
-              <Bar data={leadMeasureChartData} options={leadMeasureChartOptions} />
-            </div>
-            
-          </div>
-          <div className="mt-6">
-            <h3 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">WIG Status</h3>
-            <p className="text-xl mt-2 dark:text-white">Progress: {dataWigStatus.progress || 0}%</p>
-            <div className="min-h-[150px] pb-2">
-              <Bar data={wigStatusChartData} options={wigStatusChartOptions} />
-            </div>
-            
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="w-full lg:w-3/4 space-y-6">
-          <div className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
-            <h2 className="text-xl font-bold text-gray-600 dark:text-gray-300 mb-2">
-              Monthly Growth 2024 vs 2025
-            </h2>
-            <div className="min-h-[300px]">
-              {Object.keys(dataRevenueGrowth).length > 0 ? (
-                <Line data={areaChartData} options={areaChartOptions} height={350} />
-              ) : (
-                <p>Loading chart...</p>
-              )}
-            </div>
-          </div>
-
-          <DivisionProgressChartHorizontal
-            dataProgres={dataProgres}
-            onDivisionClick={setSelectedDivision}
-            isDarkMode={isDarkMode}
-          />
-        </main>
+      {/* Statistik Atas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <CardStat title="Total Growth" value={`${dataGrowth.globalGrowth || 0}%`} icon="pie" className="bg-white dark:bg-[#23262F]" />
+        <CardStat title="Highest Revenue" value={`${dataGrowth.revenueMetrics?.highest ?? "N/A"}%`} icon="up" className="bg-white dark:bg-[#23262F]" />
+        <CardStat title="Avg Revenue" value={`${dataGrowth.revenueMetrics?.average ?? "N/A"}%`} icon="balance" className="bg-white dark:bg-[#23262F]" />
+        <CardStat title="Lowest Revenue" value={`${dataGrowth.revenueMetrics?.lowest ?? "N/A"}%`} icon="down" className="bg-white dark:bg-[#23262F]" />
       </div>
 
-      <div className="mt-6">
-        <div className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-lg">
-          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Recent Updates</h2>
-          <div className="mb-2">
-            <select
-              value={selectedDivisionFilter}
-              onChange={e => { setSelectedDivisionFilter(e.target.value); setCurrentPage(1); }}
-              className="w-full px-3 py-1 border rounded focus:outline-none focus:ring bg-white"
-            >
-              {divisionOptions.map(div => (
-                <option key={div} value={div}>{div}</option>
-              ))}
-            </select>
+      {/* Grid atas: Kalender & Revenue Growth sejajar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+        {/* Kalender di kiri */}
+        <div className="flex flex-col h-full">
+          <div className="bg-white dark:bg-[#23262F] rounded-2xl shadow-lg p-6 h-full flex items-center justify-center">
+            <CalendarWidget />
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100 dark:bg-slate-800">
-                <tr>
-                  <th className="px-2 py-1 text-left dark:text-white">Division</th>
-                  <th className="px-2 py-1 text-left dark:text-white">WIG</th>
-                  <th className="px-2 py-1 text-left dark:text-white">Lead Measure</th>
-                  <th className="px-2 py-1 text-center dark:text-white">Input Progress</th>
-                  <th className="px-2 py-1 text-center dark:text-white">Tanggal Pelaksanaan</th>
-                  <th className="px-2 py-1 text-center dark:text-white">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((item, idx) => (
-                  <tr key={idx} className="border-t dark:border-slate-600">
-                    <td className="px-2 py-1 dark:text-white">{item.division}</td>
-                    <td className="px-2 py-1 dark:text-white">{item.wig}</td>
-                    <td className="px-2 py-1 dark:text-white">{item.leadMeasure}</td>
-                    <td className="px-2 py-1 text-center dark:text-white">{item.input}</td>
-                    <td className="px-2 py-1 text-center dark:text-white">{item.tanggal_pelaksanaan}</td>
-                    <td className="px-2 py-1 text-center dark:text-white">{item.timestamp}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-4 space-x-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 bg-gray-300 dark:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >Previous</button>
-              <span className="dark:text-white">Page {currentPage} of {totalPages}</span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 bg-gray-300 dark:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >Next</button>
+        </div>
+        {/* Revenue Growth di kanan (span 2 kolom) */}
+        <div className="lg:col-span-2 flex flex-col h-full">
+          <div className="bg-white dark:bg-[#23262F] rounded-2xl p-6 shadow-lg h-full flex flex-col">
+            <h2 className="text-lg font-semibold text-[#23262F] dark:text-white mb-2">Revenue Growth</h2>
+            <div className="flex-1 min-h-[260px] flex items-center">
+              <Line data={areaChartData} options={areaChartOptions} height={220} />
             </div>
-          )}
+          </div>
         </div>
       </div>
 
+      {/* Grid bawah: Division Progress & Status Overview sejajar, tinggi sama */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-stretch">
+        {/* Division Progress */}
+        <div className="flex flex-col h-full">
+          <div className="bg-white dark:bg-[#23262F] rounded-2xl p-6 shadow-lg h-full flex flex-col">
+            <DivisionProgressChartHorizontal
+              dataProgres={dataProgres}
+              onDivisionClick={setSelectedDivision}
+              isDarkMode={isDarkMode}
+              className="h-full"
+            />
+          </div>
+        </div>
+        {/* Status Overview */}
+        <div className="flex flex-col h-full">
+          <div className="bg-white dark:bg-[#23262F] rounded-2xl shadow-lg p-6 h-full flex flex-col">
+            <h2 className="text-lg font-semibold text-[#23262F] dark:text-white mb-2 text-center">Status Overview</h2>
+            <div className="flex flex-col gap-2 flex-1 justify-center">
+              <CardMultiRingChart
+                title="Lead Measure Status"
+                series={[
+                  dataLeadMeasureG.notStarted || 0,
+                  dataLeadMeasureG.inProgress || 0,
+                  dataLeadMeasureG.completed || 0,
+                ]}
+                labels={["Not Started", "In Progress", "Completed"]}
+                colors={["#f87171", "#fbbf24", "#34d399"]}
+                className="mb-2"
+              />
+              <CardMultiRingChart
+                title="WIG Status"
+                series={[
+                  dataWigStatus.notStarted || 0,
+                  dataWigStatus.inProgress || 0,
+                  dataWigStatus.completed || 0,
+                ]}
+                labels={["Not Started", "In Progress", "Completed"]}
+                colors={["#f87171", "#fbbf24", "#34d399"]}
+                className="mt-0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabel recent updates */}
+      <div className="bg-white dark:bg-[#23262F] rounded-2xl p-4 shadow-lg mb-8">
+        <h2 className="text-sm font-medium text-[#23262F] dark:text-white mb-2">Recent Updates</h2>
+        <div className="mb-2">
+          <select
+            value={selectedDivisionFilter}
+            onChange={e => { setSelectedDivisionFilter(e.target.value); setCurrentPage(1); }}
+            className="w-full px-3 py-1 border rounded focus:outline-none focus:ring bg-white dark:bg-[#23262F] text-[#23262F] dark:text-white border-gray-300 dark:border-gray-700"
+          >
+            {divisionOptions.map(div => (
+              <option key={div} value={div}>{div}</option>
+            ))}
+          </select>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-white dark:bg-[#23262F]">
+              <tr>
+                <th className="px-2 py-1 text-left text-[#23262F] dark:text-white">Division</th>
+                <th className="px-2 py-1 text-left text-[#23262F] dark:text-white">WIG</th>
+                <th className="px-2 py-1 text-left text-[#23262F] dark:text-white">Lead Measure</th>
+                <th className="px-2 py-1 text-center text-[#23262F] dark:text-white">Input Progress</th>
+                <th className="px-2 py-1 text-center text-[#23262F] dark:text-white">Tanggal Pelaksanaan</th>
+                <th className="px-2 py-1 text-center text-[#23262F] dark:text-white">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((item, idx) => (
+                <tr key={idx} className="border-t border-gray-300 dark:border-gray-700">
+                  <td className="px-2 py-1 text-[#23262F] dark:text-white">{item.division}</td>
+                  <td className="px-2 py-1 text-[#23262F] dark:text-white">{item.wig}</td>
+                  <td className="px-2 py-1 text-[#23262F] dark:text-white">{item.leadMeasure}</td>
+                  <td className="px-2 py-1 text-center text-[#23262F] dark:text-white">{item.input}</td>
+                  <td className="px-2 py-1 text-center text-[#23262F] dark:text-white">{item.tanggal_pelaksanaan}</td>
+                  <td className="px-2 py-1 text-center text-[#23262F] dark:text-white">{item.timestamp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 space-x-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-300 dark:bg-gray-700 text-[#23262F] dark:text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >Previous</button>
+            <span className="text-[#23262F] dark:text-white">Page {currentPage} of {totalPages}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-gray-300 dark:bg-gray-700 text-[#23262F] dark:text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >Next</button>
+          </div>
+        )}
+      </div>
+
+      {/* Modal detail division tetap ada */}
       <AnimatePresence>
         {selectedDivision && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
           >
-            <div className="bg-white dark:bg-slate-700 dark:text-gray-200 rounded-lg p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-[#23262F] text-[#23262F] dark:text-white rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold mb-4">{selectedDivision.name} Details</h2>
               <p className="mb-2">
                 <strong>Lead Measure Progress:</strong> {selectedDivision.lmProgress}%
@@ -629,29 +522,29 @@ const Dashboard = () => {
               </p>
               <table className="min-w-full text-sm mb-4">
                 <thead>
-                  <tr className="bg-gray-100 dark:bg-slate-600">
-                    <th className="border px-2 py-1 text-left">WIG</th>
-                    <th className="border px-2 py-1 text-left">Lead Measure</th>
-                    <th className="border px-2 py-1 text-center">Target</th>
-                    <th className="border px-2 py-1 text-center">Actual</th>
-                    <th className="border px-2 py-1 text-center">Achievement (%)</th>
+                  <tr className="bg-white dark:bg-[#23262F]">
+                    <th className="border px-2 py-1 text-left text-[#23262F] dark:text-white">WIG</th>
+                    <th className="border px-2 py-1 text-left text-[#23262F] dark:text-white">Lead Measure</th>
+                    <th className="border px-2 py-1 text-center text-[#23262F] dark:text-white">Target</th>
+                    <th className="border px-2 py-1 text-center text-[#23262F] dark:text-white">Actual</th>
+                    <th className="border px-2 py-1 text-center text-[#23262F] dark:text-white">Achievement (%)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedDivision.details?.map((item, idx) => (
-                    <tr key={idx} className="dark:border-slate-600">
-                      <td className="border px-2 py-1 dark:border-slate-600">{item.wigName}</td>
-                      <td className="border px-2 py-1 dark:border-slate-600">{item.leadMeasure}</td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">{item.totalTarget}</td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">{item.totalActual}</td>
-                      <td className="border px-2 py-1 text-center dark:border-slate-600">{item.achievement}%</td>
+                    <tr key={idx} className="border dark:border-[#23262F]">
+                      <td className="border px-2 py-1 text-[#23262F] dark:text-white">{item.wigName}</td>
+                      <td className="border px-2 py-1 text-[#23262F] dark:text-white">{item.leadMeasure}</td>
+                      <td className="border px-2 py-1 text-center text-[#23262F] dark:text-white">{item.totalTarget}</td>
+                      <td className="border px-2 py-1 text-center text-[#23262F] dark:text-white">{item.totalActual}</td>
+                      <td className="border px-2 py-1 text-center text-[#23262F] dark:text-white">{item.achievement}%</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <button
                 onClick={() => setSelectedDivision(null)}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                className="w-full sm:w-auto px-4 py-2 bg-[#377dff] text-white rounded hover:bg-blue-600 transition"
               >
                 Close
               </button>
