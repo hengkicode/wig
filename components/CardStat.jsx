@@ -1,11 +1,12 @@
 import React from "react";
-import { FaArrowUp, FaArrowDown, FaBalanceScale, FaChartPie } from "react-icons/fa";
+import { FaArrowUp, FaArrowDown, FaBalanceScale, FaChartPie, FaDollarSign } from "react-icons/fa";
 
 const iconMap = {
   up: <FaArrowUp className="text-green-400" style={{ fontSize: 48 }} />,
   down: <FaArrowDown className="text-red-400" style={{ fontSize: 48 }} />,
   balance: <FaBalanceScale className="text-blue-400" style={{ fontSize: 48 }} />,
   pie: <FaChartPie className="text-orange-400" style={{ fontSize: 48 }} />,
+  dollar: <FaDollarSign className="text-yellow-500" style={{ fontSize: 48 }} />,
 };
 
 export default function CardStat({

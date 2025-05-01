@@ -151,6 +151,25 @@ const Dashboard = () => {
     }
   }, [router]);
 
+  // State untuk jam digital
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = new Date();
+    return now.toLocaleTimeString('id-ID', { hour12: false });
+  });
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('id-ID', { hour12: false }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Fungsi tombol
   const handleLeadMeasure = () => router.push("/leadmeasure");
   const handleDashboard = () => router.push("/dashboard");
@@ -363,7 +382,12 @@ const Dashboard = () => {
             <button onClick={handleLogout} className="px-5 py-2 rounded-lg bg-red-500 text-white font-semibold shadow hover:bg-red-700 transition">Logout</button>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-gray-500 dark:text-gray-300">{formattedDate}</p>
+            {isMounted && (
+              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-green-400 shadow text-white font-mono text-lg tracking-widest border border-blue-300 dark:border-blue-700 animate-pulse">
+                <svg className="w-5 h-5 mr-2 text-yellow-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm.75 4a.75.75 0 00-1.5 0v4.25c0 .414.336.75.75.75h3a.75.75 0 000-1.5h-2.25V6z" /></svg>
+                {currentTime}
+              </span>
+            )}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full shadow-md transition transform hover:-translate-y-0.5"
@@ -376,7 +400,7 @@ const Dashboard = () => {
 
       {/* Statistik Atas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <CardStat title="Total Growth" value={`${dataGrowth.globalGrowth || 0}%`} icon="pie" className="bg-white dark:bg-[#23262F]" />
+        <CardStat title="Total Growth" value={`${dataGrowth.globalGrowth || 0}%`} icon="dollar" className="bg-white dark:bg-[#23262F]" />
         <CardStat title="Highest Revenue" value={`${dataGrowth.revenueMetrics?.highest ?? "N/A"}%`} icon="up" className="bg-white dark:bg-[#23262F]" />
         <CardStat title="Avg Revenue" value={`${dataGrowth.revenueMetrics?.average ?? "N/A"}%`} icon="balance" className="bg-white dark:bg-[#23262F]" />
         <CardStat title="Lowest Revenue" value={`${dataGrowth.revenueMetrics?.lowest ?? "N/A"}%`} icon="down" className="bg-white dark:bg-[#23262F]" />
